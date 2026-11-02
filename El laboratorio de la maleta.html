@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>El laboratorio de la maleta</title>
+<style>
+:root{--bg:#f7f5ef;--card:#fff;--tx:#1d2433;--mu:#5d6679;--ac:#c2410c;--ok:#15803d;--bd:#e2ded2;--sel:#ffedd5;--bar:#ea580c;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14161c;--card:#1d2029;--tx:#eceef4;--mu:#9aa3b5;--ac:#fb923c;--ok:#4ade80;--bd:#303546;--sel:#3a2a1c;--bar:#fb923c;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#14161c;--card:#1d2029;--tx:#eceef4;--mu:#9aa3b5;--ac:#fb923c;--ok:#4ade80;--bd:#303546;--sel:#3a2a1c;--bar:#fb923c;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 Georgia,"Times New Roman",serif}
+main{max-width:760px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:1.7rem;margin:.2em 0}
+p.sub{color:var(--mu);margin:0 0 16px}
+nav{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+button{font:inherit;cursor:pointer}
+nav button{padding:8px 14px;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:999px}
+nav button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.it{border:2px solid var(--bd);background:var(--card);color:var(--tx);border-radius:12px;padding:10px;text-align:left}
+.it.sel{border-color:var(--ac);background:var(--sel)}
+.it.opt{outline:3px solid var(--ok)}
+.it b{display:block}.it small{color:var(--mu)}
+.em{font-size:1.6rem}
+.bar{height:16px;border-radius:8px;background:var(--bd);overflow:hidden;margin:8px 0}
+.bar i{display:block;height:100%;background:var(--bar);transition:width .2s}
+.bar.over i{background:#dc2626}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn{padding:10px 16px;border-radius:10px;border:1px solid var(--ac);background:var(--ac);color:#fff}
+.btn.g{background:transparent;color:var(--ac)}
+.stat{display:flex;gap:18px;flex-wrap:wrap;font-variant-numeric:tabular-nums}
+.stat div{min-width:90px}.stat strong{display:block;font-size:1.4rem}
+.msg{margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--sel)}
+input[type=range]{width:100%;accent-color:var(--ac)}
+.big{font-size:2rem;font-variant-numeric:tabular-nums;color:var(--ac);word-break:break-all}
+[hidden]{display:none!important}
+details{color:var(--mu)}
+</style>
+</head>
+<body>
+<main>
+<h1>🧳 El laboratorio de la maleta</h1>
+<p class="sub">Aplicación de aula sobre el Problema de la Mochila. Haz la maleta, compara con el algoritmo y descubre por qué es tan difícil.</p>
+<div class="card" id="intro">
+<h3 style="margin-top:0">¿En qué consiste el problema?</h3>
+<p>Tienes una maleta con un <b>peso máximo</b> (por ejemplo, 17 unidades) y una lista de objetos. Cada objeto tiene dos datos: lo que <b>pesa</b> y lo <b>valioso</b> que es para tu viaje.</p>
+<p><b>Tu misión:</b> elegir qué objetos llevar para conseguir el <b>mayor valor total</b> sin pasarte del peso máximo. Cada objeto se lleva entero o se deja: no se puede llevar medio abrigo.</p>
+<p>Parece fácil, pero con solo 30 objetos hay más de 1.000 millones de maletas posibles. Los matemáticos lo llaman el <b>Problema de la Mochila</b> (<i>Knapsack Problem</i>) y es un clásico de la optimización: lo usan empresas como Amazon o DHL para cargar contenedores.</p>
+<p style="margin-bottom:0;color:var(--mu)"><b>Cómo se juega:</b> en la pestaña 1 toca los objetos para meterlos o sacarlos de la maleta. Cuando creas que has logrado el mejor valor, pulsa «Comprobar».</p>
+</div>
+<nav>
+<button id="t1" class="on">1 · El reto</button>
+<button id="t2" class="">2 · Explosión de combinaciones</button>
+<button id="t3" class="">3 · Para el aula</button>
+</nav>
+
+<section id="p1">
+<div class="card">
+<div class="row" style="justify-content:space-between">
+<div><b>Peso máximo:</b> <span id="cap"></span> unidades</div>
+<div class="row"><button class="btn g" id="nuevo">Nuevo reto</button><button class="btn g" id="limpiar">Vaciar</button></div>
+</div>
+<div class="bar" id="bar"><i id="fill" style="width:0"></i></div>
+<div class="stat"><div>Peso<strong id="w">0</strong></div><div>Valor<strong id="v">0</strong></div><div>Intentos<strong id="n">0</strong></div></div>
+</div>
+<div class="grid" id="items"></div>
+<div class="card" style="margin-top:14px">
+<div class="row"><button class="btn" id="check">Comprobar mi maleta</button><button class="btn g" id="reveal">Ver solución óptima</button></div>
+<div id="res" class="msg" hidden></div>
+</div>
+</section>
+
+<section id="p2" hidden>
+<div class="card">
+<p>Con <b>n</b> objetos hay 2<sup>n</sup> maletas posibles (cada objeto entra o no entra).</p>
+<label>n = <b id="nv">10</b> objetos</label>
+<input type="range" id="sl" min="1" max="100" value="10">
+<p>Combinaciones:</p><div class="big" id="comb"></div>
+<p>Si un ordenador revisara 1.000 millones de maletas por segundo, tardaría:</p><div class="big" id="tiempo"></div>
+<p id="comp" style="color:var(--mu)"></p>
+</div>
+</section>
+
+<section id="p3" hidden>
+<div class="card">
+<h3 style="margin-top:0">Guía rápida para el profesorado</h3>
+<ol>
+<li><b>Predicción (3 min):</b> antes de empezar, ¿cuánto creen que se acercarán al óptimo?</li>
+<li><b>Reto en parejas (10 min):</b> cada pareja usa «Nuevo reto» y anota su % de acierto.</li>
+<li><b>Comparación:</b> «Comprobar» muestra el valor del algoritmo voraz (por valor/peso) frente al óptimo exacto.</li>
+<li><b>Explosión:</b> en la pestaña 2, ¿a partir de qué n deja de ser viable la fuerza bruta?</li>
+</ol>
+<h4>Preguntas para debatir</h4>
+<ul>
+<li>¿Por qué el algoritmo voraz a veces falla si es tan razonable?</li>
+<li>¿Qué cambia si además hay un límite de volumen y no solo de peso?</li>
+<li>¿Dónde aparece este problema en la vida real (logística, inversiones, horarios)?</li>
+</ul>
+<details><summary>Cómo calcula el óptimo la aplicación</summary>
+<p>Usa programación dinámica: con pesos enteros, construye una tabla de mejor valor para cada peso máximo posible. Es rápida para pocos objetos, pero crece con el peso máximo, y por eso el problema sigue siendo NP-duro en general.</p></details>
+</div>
+</section>
+</main>
+
+<script>
+(function(){
+var POOL=[["🛂","Pasaporte",1,10],["🔌","Cargador",1,8],["👟","Zapatos",4,6],["👕","Camisetas",3,7],["👖","Pantalones",4,6],["🧥","Abrigo",6,7],["🧴","Neceser",2,6],["📚","Libros",5,4],["💻","Portátil",5,9],["📷","Cámara",3,5],["🩴","Chanclas",2,3],["☂️","Paraguas",2,3],["🎧","Auriculares",1,5],["🍫","Tentempiés",2,3],["🎲","Juegos",3,3],["🧦","Calcetines",1,4]];
+var items=[],sel={},cap=0,tries=0,opt=null,greedy=0;
+var $=function(i){return document.getElementById(i)};
+
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+
+function solve(){
+ var n=items.length,dp=[],i,c;
+ for(i=0;i<=n;i++){dp.push(new Array(cap+1).fill(0))}
+ for(i=1;i<=n;i++){for(c=0;c<=cap;c++){
+  dp[i][c]=dp[i-1][c];
+  if(items[i-1][2]<=c){var x=dp[i-1][c-items[i-1][2]]+items[i-1][3];if(x>dp[i][c])dp[i][c]=x}
+ }}
+ var set={};c=cap;
+ for(i=n;i>0;i--){if(dp[i][c]!==dp[i-1][c]){set[i-1]=1;c-=items[i-1][2]}}
+ opt={value:dp[n][cap],set:set};
+ var ord=items.map(function(_,k){return k}).sort(function(a,b){return items[b][3]/items[b][2]-items[a][3]/items[a][2]});
+ var w=0;greedy=0;
+ ord.forEach(function(k){if(w+items[k][2]<=cap){w+=items[k][2];greedy+=items[k][3]}});
+}
+
+function totals(){var w=0,v=0;for(var k in sel){w+=items[k][2];v+=items[k][3]}return{w:w,v:v}}
+
+function render(showOpt){
+ var h="";
+ items.forEach(function(it,k){
+  h+='<button class="it'+(sel[k]?' sel':'')+(showOpt&&opt.set[k]?' opt':'')+'" data-k="'+k+'"><span class="em">'+it[0]+'</span><b>'+it[1]+'</b><small>Peso '+it[2]+' · Valor '+it[3]+'</small></button>';
+ });
+ $("items").innerHTML=h;
+ var t=totals();
+ $("w").textContent=t.w;$("v").textContent=t.v;$("n").textContent=tries;
+ $("fill").style.width=Math.min(100,t.w/cap*100)+"%";
+ $("bar").className="bar"+(t.w>cap?" over":"");
+ $("cap").textContent=cap;
+}
+
+function nuevo(){
+ items=shuffle(POOL).slice(0,10);
+ var tot=items.reduce(function(a,i){return a+i[2]},0);
+ cap=Math.round(tot*0.45);sel={};tries=0;
+ solve();$("res").hidden=true;render(false);
+}
+
+function check(){
+ var t=totals(),r=$("res");r.hidden=false;
+ if(t.w>cap){r.textContent="Tu maleta pesa "+t.w+" y el peso máximo es "+cap+": no cierra. Quita algo.";return}
+ tries++;
+ var p=Math.round(t.v/opt.value*100);
+ var m="Tu valor: "+t.v+" · Voraz: "+greedy+" · Óptimo: "+opt.value+" → has logrado el "+p+" % del óptimo. ";
+ if(t.v===opt.value)m+="¡Maleta perfecta! 🎉";
+ else if(t.v>greedy)m+="Has superado al algoritmo voraz. 👏";
+ else if(t.v===greedy)m+="Igualas al algoritmo voraz.";
+ else m+="El algoritmo voraz te gana esta vez; prueba otra combinación.";
+ r.textContent=m;render(false);
+}
+
+$("items").addEventListener("click",function(e){
+ var b=e.target.closest("[data-k]");if(!b)return;
+ var k=b.getAttribute("data-k");if(sel[k])delete sel[k];else sel[k]=1;
+ $("res").hidden=true;render(false);
+});
+$("check").onclick=check;
+$("reveal").onclick=function(){
+ var r=$("res");r.hidden=false;
+ r.textContent="Solución óptima (valor "+opt.value+") marcada en verde. Compárala con tu elección: ¿qué objeto pequeño pero valioso te faltaba?";
+ render(true);
+};
+$("limpiar").onclick=function(){sel={};$("res").hidden=true;render(false)};
+$("nuevo").onclick=nuevo;
+
+function fmt(n){
+ if(n<1e15)return Math.round(n).toLocaleString("es-ES");
+ var e=Math.floor(Math.log10(n));return (n/Math.pow(10,e)).toFixed(2).replace(".",",")+" × 10^"+e;
+}
+function dur(s){
+ if(s<1)return "menos de un segundo";
+ var u=[["años",31557600],["días",86400],["horas",3600],["minutos",60],["segundos",1]];
+ if(s>=31557600){var y=s/31557600;return (y<1e6?Math.round(y).toLocaleString("es-ES"):fmt(y))+" años"}
+ for(var i=1;i<u.length;i++)if(s>=u[i][1])return Math.round(s/u[i][1]).toLocaleString("es-ES")+" "+u[i][0];
+}
+function upd(){
+ var n=+$("sl").value;$("nv").textContent=n;
+ var c=Math.pow(2,n);$("comb").textContent=fmt(c);
+ var s=c/1e9;$("tiempo").textContent=dur(s);
+ var age=4.5e9*31557600;
+ $("comp").textContent=s>age?"Más que la edad de la Tierra (unos 4.500 millones de años).":(n<=30?"Un ordenador lo resuelve sin problema.":"Ya empieza a ser incómodo.");
+}
+$("sl").oninput=upd;
+
+var tabs=["t1","t2","t3"],pans=["p1","p2","p3"];
+tabs.forEach(function(id,i){$(id).onclick=function(){
+ tabs.forEach(function(t,j){$(t).className=i===j?"on":"";$(pans[j]).hidden=i!==j});
+}});
+
+nuevo();upd();
+})();
+</script>
+</body>
+</html>

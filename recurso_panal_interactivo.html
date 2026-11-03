@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>El misterio geométrico del panal</title>
+<style>
+:root{--ink:#263238;--gold:#e8b323;--honey:#fff4cf;--green:#267653;--bg:#f7f8fa;--line:#dfe4e8}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{background:linear-gradient(120deg,#fff0b7,#f8d76d);padding:2rem 1rem;text-align:center}
+header h1{margin:.3rem auto;max-width:800px;font-size:clamp(1.8rem,4vw,3rem);line-height:1.15}
+header p{max-width:720px;margin:1rem auto}
+main{max-width:920px;margin:1.5rem auto;padding:0 1rem 3rem}
+section{background:white;border:1px solid var(--line);border-radius:16px;padding:1.25rem;margin:1rem 0;box-shadow:0 3px 12px #2632380b}
+h2{margin-top:0}button{border:0;border-radius:10px;padding:.7rem 1rem;background:var(--green);color:white;font-weight:700;cursor:pointer}
+button:disabled{opacity:.45;cursor:not-allowed}.secondary{background:#e9edf0;color:var(--ink)}
+progress{width:100%;height:10px;accent-color:var(--green)}
+.option{display:block;padding:.8rem;border:1px solid var(--line);border-radius:10px;margin:.5rem 0;cursor:pointer}
+.option:has(input:checked){background:#f0f7f3;border-color:var(--green)}
+.feedback{background:#f2f5f7;border-radius:10px;padding:1rem;margin-top:1rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
+table{width:100%;border-collapse:collapse;margin:.8rem 0}th,td{padding:.65rem;border-bottom:1px solid var(--line);text-align:left}
+input[type=range]{width:100%;accent-color:var(--green)}textarea{width:100%;min-height:120px;border:1px solid #bbc5cc;border-radius:10px;padding:.8rem;font:inherit}
+.hexes{font-size:clamp(2rem,6vw,4rem);letter-spacing:.1em;color:#bd8a00;text-align:center}
+.small{font-size:.9rem;color:#58666e}
+@media print{body{background:white}button{display:none}section{box-shadow:none;break-inside:avoid}}
+</style>
+</head>
+<body>
+<header>
+<div aria-hidden="true" style="font-size:3rem">🐝 ⬡ 🍯</div>
+<h1>El misterio geométrico del panal</h1>
+<p>Recurso interactivo para aplicar la comprensión lectora, la geometría, la optimización y el valor del trabajo cooperativo.</p>
+</header>
+<main>
+<section>
+<h2>1. Reto de comprensión</h2>
+<p>Responde a las seis preguntas. Comprueba cada respuesta y lee la explicación.</p>
+<div id="quiz">
+<div class="small" id="progressText">Pregunta 1 de 6</div><progress id="progress" value="1" max="6"></progress>
+<h3 id="question"></h3><div id="options"></div><div id="feedback" class="feedback" hidden></div>
+<div style="display:flex;justify-content:space-between;gap:1rem;margin-top:1rem">
+<span id="score" class="small">Puntuación: 0</span><button id="check">Comprobar</button><button id="next" hidden>Siguiente</button>
+</div>
+</div>
+<div id="result" hidden><h3 id="resultTitle"></h3><p id="resultText"></p><button onclick="restartQuiz()">Repetir reto</button></div>
+</section>
+
+<section>
+<h2>2. Laboratorio de los hexágonos</h2>
+<p>Compara el perímetro de polígonos regulares que encierran una misma área. Modifica el área con el control deslizante.</p>
+<label for="area"><strong>Área de cada celda: <span id="areaValue">100</span> cm²</strong></label>
+<input id="area" type="range" min="25" max="400" step="25" value="100">
+<table><thead><tr><th>Figura</th><th>Perímetro aproximado</th></tr></thead><tbody>
+<tr><td>Triángulo equilátero</td><td id="tri"></td></tr>
+<tr><td>Cuadrado</td><td id="square"></td></tr>
+<tr><td>Hexágono regular</td><td id="hex"></td></tr>
+</tbody></table>
+<p id="labConclusion" class="feedback"></p>
+<p class="small">Modelo geométrico ideal: no considera el grosor de las paredes ni la estructura tridimensional del panal.</p>
+</section>
+
+<section>
+<h2>3. Construimos un panal cooperativo</h2>
+<div class="hexes" aria-label="Patrón de hexágonos">⬡ ⬡ ⬡<br> ⬡ ⬡ ⬡ ⬡<br>⬡ ⬡ ⬡</div>
+<p><strong>Misión de equipo:</strong> construid una estructura común con piezas hexagonales. Cada persona debe aportar una pieza y coordinarse con las demás.</p>
+<div class="grid">
+<div><h3>Fase 1 · Diseñar</h3><p>Dibujad un hexágono regular por participante.</p></div>
+<div><h3>Fase 2 · Construir</h3><p>Recortad las piezas y añadid un detalle que os identifique.</p></div>
+<div><h3>Fase 3 · Cooperar</h3><p>Unidlas para cubrir una superficie sin huecos.</p></div>
+<div><h3>Fase 4 · Analizar</h3><p>Retirad o girad una pieza. ¿Cómo afecta al conjunto?</p></div>
+</div>
+</section>
+
+<section>
+<h2>4. Reflexión final</h2>
+<label for="reflection"><strong>¿Qué podemos aprender de las abejas sobre la eficiencia, la geometría y el trabajo en equipo?</strong></label>
+<textarea id="reflection" placeholder="Mi conclusión es que..."></textarea>
+<p><button id="finishReflection">Finalizar reflexión</button> <button class="secondary" onclick="window.print()">Imprimir / Guardar como PDF</button></p>
+<div id="reflectionFeedback" class="feedback" hidden></div>
+</section>
+<section>
+<h2>Ideas clave del texto</h2>
+<ul>
+<li>El hexágono regular tesela el plano y encierra un área con poco perímetro.</li>
+<li>El fondo de las celdas está formado por tres rombos inclinados que encajan.</li>
+<li>En los encuentros de tres celdas, las paredes tienden a formar ángulos de 120°.</li>
+<li>Las pequeñas acciones de las abejas generan un patrón colectivo ordenado.</li>
+<li>La cooperación y el uso consciente de los recursos mejoran el resultado común.</li>
+</ul>
+</section>
+<footer class="small">Recurso didáctico elaborado a partir del texto proporcionado sobre la geometría del panal.</footer>
+</main>
+<script>
+const questions=[
+{topic:"Comprensión lectora",q:"¿Cuál es la principal razón por la que las abejas construyen celdillas hexagonales?",a:["Porque el hexágono es la única figura que puede cubrir una superficie.","Porque permite encerrar una gran área utilizando poco material.","Porque las abejas pueden construirlo sin utilizar cera."],c:1,e:"El hexágono cubre una superficie sin huecos y encierra más área con menos perímetro que otras figuras regulares que teselan el plano."},
+{topic:"Geometría",q:"¿Qué polígonos regulares pueden cubrir una superficie sin dejar huecos?",a:["Triángulos equiláteros, cuadrados y hexágonos regulares.","Pentágonos, cuadrados y hexágonos.","Solo cuadrados y hexágonos."],c:0,e:"Los triángulos equiláteros, cuadrados y hexágonos regulares pueden cubrir el plano sin dejar huecos."},
+{topic:"Geometría espacial",q:"¿Cómo describe el texto el fondo de cada celda?",a:["Como una superficie plana cuadrada.","Como una pirámide de base triangular.","Como tres rombos inclinados que encajan con las celdas de la otra cara."],c:2,e:"Tres rombos inclinados forman el fondo de cada celda y permiten que las celdas de ambas caras encajen."},
+{topic:"Razonamiento",q:"En los puntos donde se encuentran tres celdas, ¿qué ángulo tienden a formar las paredes?",a:["90°","120°","180°"],c:1,e:"Las paredes tienden a formar ángulos de 120°, favoreciendo la estabilidad y continuidad."},
+{topic:"Pensamiento crítico",q:"¿Qué significa que el patrón del panal emerge de pequeñas acciones locales?",a:["Una abeja diseña toda la estructura antes de construirla.","Las abejas construyen sin relacionarse.","La cooperación de muchas abejas genera un patrón ordenado sin que una sola controle todo."],c:2,e:"Cada obrera realiza pequeñas acciones y ajusta su trabajo al entorno; la suma produce una estructura organizada."},
+{topic:"Aplicación",q:"¿Qué ejemplo humano refleja mejor la lección del panal?",a:["Un equipo en el que cada persona contribuye y coordina su trabajo.","Una persona que realiza todas las tareas.","Un grupo que utiliza más recursos para terminar antes."],c:0,e:"El texto destaca la cooperación, el uso eficiente de los recursos y la responsabilidad individual."}
+];
+let index=0,points=0,answered=false;
+const $=id=>document.getElementById(id);
+function render(){
+const q=questions[index];answered=false;
+$("progressText").textContent=`Pregunta ${index+1} de ${questions.length}`;
+$("progress").value=index+1;$("question").textContent=q.topic+" · "+q.q;
+$("options").innerHTML=q.a.map((x,i)=>`<label class="option"><input type="radio" name="answer" value="${i}"> ${String.fromCharCode(65+i)}. ${x}</label>`).join("");
+$("feedback").hidden=true;$("check").hidden=false;$("next").hidden=true;
+$("score").textContent=`Puntuación: ${points}/${index}`;
+}
+$("check").onclick=()=>{
+if(answered)return;const sel=document.querySelector('input[name="answer"]:checked');
+if(!sel){alert("Selecciona una respuesta.");return}
+answered=true;const q=questions[index],correct=+sel.value===q.c;if(correct)points++;
+$("feedback").hidden=false;$("feedback").innerHTML=`<strong>${correct?"¡Correcto!":"Respuesta para revisar."}</strong><br>${q.e}`;
+$("check").hidden=true;$("next").hidden=false;$("score").textContent=`Puntuación: ${points}/${index+1}`;
+};
+$("next").onclick=()=>{
+if(index<questions.length-1){index++;render()}else{
+$("quiz").hidden=true;$("result").hidden=false;
+$("resultTitle").textContent=`¡Reto completado! ${points}/${questions.length}`;
+$("resultText").textContent=points===6?"¡Excelente! Has comprendido la geometría y la inteligencia colectiva del panal.":points>=4?"¡Muy bien! Has comprendido las ideas principales.":"¡Buen trabajo! Repasa las explicaciones y vuelve a intentarlo.";
+}};
+function restartQuiz(){index=0;points=0;$("quiz").hidden=false;$("result").hidden=true;render()}
+const fmt=n=>n.toFixed(2)+" cm";
+function updateLab(){
+const A=+$("area").value;
+const tri=6*Math.sqrt(A/Math.sqrt(3)),square=4*Math.sqrt(A),hex=6*Math.sqrt(2*A/(3*Math.sqrt(3)));
+$("areaValue").textContent=A;$("tri").textContent=fmt(tri);$("square").textContent=fmt(square);$("hex").textContent=fmt(hex);
+$("labConclusion").textContent=`Para un área de ${A} cm², el hexágono necesita aproximadamente ${fmt(hex)} de perímetro, frente a ${fmt(square)} del cuadrado. El hexágono ahorra alrededor de ${((1-hex/square)*100).toFixed(1)}% de perímetro respecto al cuadrado.`;
+}
+$("area").addEventListener("input",updateLab);updateLab();render();
+$("finishReflection").onclick=()=>{
+const val=$("reflection").value.trim();if(val.length<10){alert("Escribe una conclusión de al menos 10 caracteres.");return}
+$("reflectionFeedback").hidden=false;$("reflectionFeedback").textContent="¡Reflexión completada! Tu conclusión: "+val;
+};
+</script>
+</body></html>

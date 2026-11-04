@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>La geometría del olivar · Repaso interactivo</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#eee8d6;--card:#faf6ea;--tx:#2a2a1e;--mu:#6b6a52;--pr:#66702f;--pr2:#4b5422;--ok:#3d6b2c;--ko:#9c2f22;--bd:#cdc4a5;--ac:#e2dbbf}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#171c11;--card:#222a19;--tx:#e8eed9;--mu:#a9b894;--pr:#8fb84a;--pr2:#b5d676;--ok:#7bd17f;--ko:#ff8a80;--bd:#39452b;--ac:#2f3b20}}
+:root[data-theme="dark"]{--bg:#171c11;--card:#222a19;--tx:#e8eed9;--mu:#a9b894;--pr:#8fb84a;--pr2:#b5d676;--ok:#7bd17f;--ko:#ff8a80;--bd:#39452b;--ac:#2f3b20}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.6 Georgia,"Iowan Old Style","Palatino Linotype",serif}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.07;mix-blend-mode:multiply;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+button,label.sm,.sm,.fb,.opt,input,select,textarea{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:760px;margin:0 auto;padding:14px}
+header{position:relative;overflow:hidden;color:#fff;border-radius:6px;padding:0;margin-bottom:14px;min-height:190px;box-shadow:0 1px 2px rgba(40,35,15,.35),0 8px 22px rgba(40,35,15,.22)}
+header svg{position:absolute;inset:0;width:100%;height:100%;max-height:none}
+header .tx{position:relative;padding:112px 18px 16px;background:linear-gradient(to top,rgba(25,22,8,.78),rgba(25,22,8,0))}
+header h1{margin:0 0 2px;font-size:1.5rem;font-weight:600;letter-spacing:.01em;text-shadow:0 1px 4px rgba(0,0,0,.55)}header p{margin:0;opacity:.95;font-size:.88rem;font-style:italic;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:5px;padding:14px 16px;margin:12px 0;box-shadow:0 1px 1px rgba(60,50,20,.12),0 4px 10px rgba(60,50,20,.08)}
+.card h2{margin:0 0 8px;font-size:1.05rem;color:var(--pr2)}
+label{display:block;font-size:.85rem;color:var(--mu);margin:8px 0 3px}
+input,select,textarea{width:100%;padding:9px 10px;border:1px solid var(--bd);border-radius:4px;background:var(--bg);color:var(--tx);font-size:1rem;box-shadow:inset 0 1px 2px rgba(60,50,20,.15)}
+button{padding:9px 14px;border:0;border-radius:4px;background:var(--pr);color:#f7f3e2;font-size:.95rem;font-weight:600;cursor:pointer;box-shadow:0 1px 2px rgba(40,35,15,.35)}button:active{transform:translateY(1px);box-shadow:none}
+button.sec{background:var(--ac);color:var(--tx)}button:disabled{opacity:.5}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.row>input{flex:1;min-width:120px}
+.bar{height:10px;background:var(--ac);border-radius:6px;overflow:hidden;margin-top:8px}.bar i{display:block;height:100%;width:0;background:var(--pr);transition:width .3s}
+.q{border-top:1px dashed var(--bd);padding-top:10px;margin-top:10px}.q:first-of-type{border:0;margin-top:0;padding-top:0}
+.q p{margin:0 0 6px}.opt{display:flex;gap:8px;align-items:center;padding:7px 9px;border:1px solid var(--bd);border-radius:10px;margin:5px 0;cursor:pointer}.opt input{width:auto}
+.fb{margin-top:6px;font-size:.9rem}.fb.ok{color:var(--ok)}.fb.ko{color:var(--ko)}
+.sm{font-size:.82rem;color:var(--mu)}
+svg{width:100%;height:auto;max-height:150px}
+</style>
+</head>
+<body>
+<main>
+<header><svg id="sc" viewBox="0 0 700 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg><div class="tx"><h1>La geometría del olivar</h1><p>Cuaderno de repaso · 12 pruebas en 4 bloques · nota sobre 10 e informe en PDF</p></div></header>
+
+<div class="card">
+<h2>Identificación</h2>
+<label for="nom">Nombre y apellidos</label><input id="nom" autocomplete="name">
+<label for="grp">Curso y grupo</label><input id="grp" placeholder="p. ej. 2.º ESO B">
+</div>
+
+<div class="card">
+<h2>Guardar o continuar más tarde</h2>
+<p class="sm">Copia tu código de progreso y pégalo aquí cuando quieras seguir.</p>
+<div class="row"><button class="sec" id="sv">Generar código</button><button class="sec" id="ld">Cargar código</button></div>
+<textarea id="code" rows="2" placeholder="Pega aquí tu código de progreso"></textarea>
+<div class="sm" id="cmsg"></div>
+</div>
+
+<div class="card"><div class="row"><b id="pt">0 / 12 resueltas</b></div><div class="bar"><i id="pb"></i></div></div>
+
+<div id="blocks"></div>
+
+<div class="card" id="fin">
+<h2>Nota e informe</h2>
+<label for="mode">Tipo de informe</label>
+<select id="mode"><option value="no">Informe con resultados, sin soluciones</option><option value="si">Informe con resultados y soluciones</option></select>
+<div id="rv" style="display:none"><label for="rc">Código «revelar» (te lo da el profesor)</label><input id="rc" autocomplete="off"></div>
+<div class="row" style="margin-top:10px"><button id="gen">Calcular nota y generar informe</button></div>
+<div id="res" class="fb"></div>
+</div>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const B=["Marco de plantación","La copa del olivo","Luz y seto","Cosecha y costes"];
+const Q=[
+{b:0,t:"n",q:"Un olivar tradicional tiene un marco de 7 m × 7 m. ¿Cuántos olivos caben en 1 ha (10 000 m²)? Redondea a la unidad.",a:204,s:"Cada olivo ocupa 7·7 = 49 m². 10 000 : 49 ≈ 204 olivos/ha."},
+{b:0,t:"n",q:"En un olivar superintensivo el marco es de 4 m entre filas y 2 m entre olivos. ¿Cuántos olivos hay por hectárea?",a:1250,s:"Cada olivo ocupa 4·2 = 8 m². 10 000 : 8 = 1 250 olivos/ha."},
+{b:0,t:"n",q:"Una finca rectangular mide 120 m × 80 m y se planta con marco de 8 m × 8 m. ¿Cuántos olivos se plantan?",a:150,s:"A lo largo: 120 : 8 = 15. A lo ancho: 80 : 8 = 10. Total: 15·10 = 150 olivos."},
+{b:1,t:"n",q:"En un olivar en vaso las ramas forman 60° con la horizontal. ¿Qué ángulo forman con la vertical?",a:30,tol:0,s:"Horizontal y vertical forman 90°: 90° − 60° = 30°."},
+{b:1,t:"n",q:"Una copa se aproxima por un cilindro de 4 m de diámetro y 3 m de altura. ¿Volumen en m³? (π ≈ 3,14; un decimal)",a:37.7,tol:.3,s:"Radio 2 m. V = π·r²·h = 3,14·4·3 ≈ 37,7 m³."},
+{b:1,t:"n",q:"Cada olivo tiene 40 m³ de copa y hay 200 olivos por hectárea. ¿Volumen de copa por hectárea (m³)?",a:8000,s:"40·200 = 8 000 m³/ha, dentro del rango orientativo de 6 000 a 10 000 m³/ha."},
+{b:2,t:"n",q:"Un seto mide 3 m de altura y 100 m de longitud. ¿Superficie de sus dos caras laterales (m²)?",a:600,s:"Una cara: 3·100 = 300 m². Dos caras: 600 m²."},
+{b:2,t:"n",q:"Con 4 m entre filas y un seto de 1 m de anchura, ¿qué porcentaje del ancho de cada franja ocupa el seto? (solo el número)",a:25,tol:0,s:"1 : 4 = 0,25 = 25 %."},
+{b:2,t:"o",q:"¿Qué orientación de filas reparte la luz de forma más equilibrada entre las dos caras del seto?",o:["Norte-Sur","Este-Oeste","Da igual","Siempre diagonal"],c:0,s:"Con filas norte-sur, una cara recibe más sol por la mañana y la otra por la tarde."},
+{b:3,t:"n",q:"Una hectárea produce 8 000 kg de aceituna con un rendimiento graso del 20 %. ¿Cuántos kg de aceite se obtienen?",a:1600,s:"20 % de 8 000 = 0,20·8 000 = 1 600 kg."},
+{b:3,t:"n",q:"Una finca de 5 ha tiene 204 olivos por hectárea. ¿Cuántos olivos hay en total?",a:1020,s:"5·204 = 1 020 olivos."},
+{b:3,t:"o",q:"Si el seto crece demasiado ancho, ¿qué ocurre?",o:["La luz no llega al centro ni a la base","Produce siempre más aceituna","Se reduce el sombreado","La calle se ensancha"],c:0,s:"Un seto muy ancho sombrea su interior y la parte baja pierde capacidad productiva."}
+];
+const S={ans:Array(12).fill(null),att:Array(12).fill(0),ok:Array(12).fill(false)};
+const $=id=>document.getElementById(id);
+function pts(i){return !S.ok[i]?0:(S.att[i]===1?1:.5)}
+function nota(){return Math.round(Q.reduce((s,_,i)=>s+pts(i),0)/12*1000)/100}
+function build(){
+ let h="";
+ B.forEach((n,bi)=>{h+=`<div class="card"><h2>Bloque ${bi+1}. ${n}</h2>`;
+ Q.forEach((q,i)=>{if(q.b!==bi)return;
+  h+=`<div class="q"><p><b>${i+1}.</b> ${q.q}</p>`;
+  if(q.t==="n")h+=`<div class="row"><input id="a${i}" inputmode="decimal" placeholder="Tu respuesta"><button data-i="${i}">Comprobar</button></div>`;
+  else{q.o.forEach((o,k)=>h+=`<label class="opt"><input type="radio" name="r${i}" value="${k}">${o}</label>`);h+=`<button data-i="${i}">Comprobar</button>`}
+  h+=`<div class="fb" id="f${i}"></div></div>`});
+ h+="</div>"});
+ $("blocks").innerHTML=h;
+ document.querySelectorAll("button[data-i]").forEach(b=>b.onclick=()=>chk(+b.dataset.i));
+}
+function chk(i){
+ const q=Q[i];let v,good;
+ if(q.t==="n"){v=$("a"+i).value.trim().replace(",",".");if(v==="")return;good=Math.abs(parseFloat(v)-q.a)<=(q.tol??1)}
+ else{const r=document.querySelector(`input[name=r${i}]:checked`);if(!r)return;v=r.value;good=+v===q.c}
+ if(S.ok[i])return;
+ S.att[i]++;S.ans[i]=v;
+ const f=$("f"+i);
+ if(good){S.ok[i]=true;f.className="fb ok";f.textContent="✔ Correcto. "+q.s}
+ else{f.className="fb ko";f.textContent=S.att[i]<2?"✘ No es correcto. Revísalo e inténtalo otra vez.":"✘ Sigue sin ser correcto. Puedes continuar con otra prueba."}
+ prog();
+}
+function prog(){const d=S.ok.filter(Boolean).length;$("pt").textContent=d+" / 12 resueltas";$("pb").style.width=d/12*100+"%"}
+function restore(){
+ Q.forEach((q,i)=>{const f=$("f"+i);
+  if(q.t==="n"&&S.ans[i]!==null)$("a"+i).value=S.ans[i];
+  if(S.ok[i]){f.className="fb ok";f.textContent="✔ Correcto. "+q.s}
+  else if(S.att[i]){f.className="fb ko";f.textContent="✘ Pendiente de acertar."}});
+ prog();
+}
+$("sv").onclick=()=>{
+ try{$("code").value=btoa(unescape(encodeURIComponent(JSON.stringify({n:$("nom").value,g:$("grp").value,s:S}))));$("cmsg").textContent="Código generado. Cópialo y guárdalo."}
+ catch(e){$("cmsg").textContent="No se pudo generar el código."}
+};
+$("ld").onclick=()=>{
+ try{const d=JSON.parse(decodeURIComponent(escape(atob($("code").value.trim()))));
+  if(!d.s||d.s.ans.length!==12)throw 0;
+  Object.assign(S,d.s);$("nom").value=d.n||"";$("grp").value=d.g||"";restore();$("cmsg").textContent="Progreso cargado."}
+ catch(e){$("cmsg").textContent="El código no es válido."}
+};
+$("mode").onchange=()=>$("rv").style.display=$("mode").value==="si"?"block":"none";
+$("gen").onclick=()=>{
+ const res=$("res"),n=nota(),sol=$("mode").value==="si";
+ if(!$("nom").value.trim()){res.className="fb ko";res.textContent="Escribe tu nombre y apellidos en Identificación.";return}
+ if(sol&&$("rc").value.trim().toLowerCase()!=="revelar"){res.className="fb ko";res.textContent="Código «revelar» incorrecto. Elige el informe sin soluciones o introduce el código.";return}
+ res.className="fb ok";res.textContent="Nota: "+String(n).replace(".",",")+" / 10";
+ pdf(n,sol);
+};
+function pdf(n,sol){
+ const nom=$("nom").value.trim(),g=$("grp").value.trim(),fe=new Date().toLocaleDateString("es-ES");
+ if(!(window.jspdf&&window.jspdf.jsPDF)){window.print();return}
+ const d=new window.jspdf.jsPDF({unit:"mm",format:"a4"});let y=18;
+ const L=(t,sz,b)=>{d.setFontSize(sz);d.setFont("helvetica",b?"bold":"normal");d.splitTextToSize(t,180).forEach(l=>{if(y>280){d.addPage();y=18}d.text(l,15,y);y+=sz*.45+1.5})};
+ L("La geometría del olivar · Informe de resultados",15,1);y+=2;
+ L("Alumno/a: "+nom+"   Grupo: "+g+"   Fecha: "+fe,11);
+ L("Nota final: "+String(n).replace(".",",")+" / 10",13,1);y+=2;
+ B.forEach((nb,bi)=>{L("Bloque "+(bi+1)+". "+nb,12,1);
+  Q.forEach((q,i)=>{if(q.b!==bi)return;
+   L((i+1)+". "+(S.ok[i]?"Correcta":"No resuelta")+" · intentos: "+S.att[i]+" · puntos: "+String(pts(i)).replace(".",","),10);
+   if(sol)L("   Solución: "+q.s,9)});y+=2});
+ d.save("informe-geometria-olivar.pdf");
+}
+function scene(){
+ const s=document.getElementById("sc");let h=`<defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fa7b5"/><stop offset=".55" stop-color="#e8cf9c"/><stop offset="1" stop-color="#f1c98a"/></linearGradient><linearGradient id="gd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7d6a3f"/><stop offset="1" stop-color="#5b4426"/></linearGradient><filter id="bl"><feGaussianBlur stdDeviation="1.1"/></filter><filter id="gr"><feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="2"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .5 0"/></filter></defs><rect width="700" height="200" fill="url(#sk)"/><ellipse cx="420" cy="70" rx="90" ry="30" fill="#fff3d0" opacity=".45" filter="url(#bl)"/><path d="M0 92 Q120 70 260 86 T520 80 T700 90 V200 H0Z" fill="#8a8c63" filter="url(#bl)"/><path d="M0 100 Q180 84 350 98 T700 96 V200 H0Z" fill="url(#gd)"/>`;
+ let seed=7;const r=()=>(seed=(seed*9301+49297)%233280)/233280;
+ for(let k=0;k<20;k++){const t=Math.pow(k/19,1.7),sc=.06+t*1.05,y=100+t*115;
+  for(let i=-7;i<=7;i++){const x=350+i*95*sc+(r()-.5)*3*sc,w=(15+r()*5)*sc*1.7,hh=w*.78;
+   h+=`<ellipse cx="${x.toFixed(1)}" cy="${(y+3*sc).toFixed(1)}" rx="${(w*1.05).toFixed(1)}" ry="${(w*.22).toFixed(1)}" fill="#3a2a14" opacity=".45"/><rect x="${(x-1.2*sc).toFixed(1)}" y="${(y-hh*.55).toFixed(1)}" width="${(2.4*sc).toFixed(1)}" height="${(hh*.6).toFixed(1)}" fill="#4a3b25"/><ellipse cx="${x.toFixed(1)}" cy="${(y-hh).toFixed(1)}" rx="${w.toFixed(1)}" ry="${hh.toFixed(1)}" fill="hsl(${70+r()*14},${18+r()*10}%,${34+r()*10}%)"/><ellipse cx="${(x+w*.2).toFixed(1)}" cy="${(y-hh*1.25).toFixed(1)}" rx="${(w*.6).toFixed(1)}" ry="${(hh*.45).toFixed(1)}" fill="#a9ad7c" opacity=".45"/>`}}
+ h+=`<rect width="700" height="200" filter="url(#gr)" opacity=".18"/>`;
+ s.innerHTML=h;
+}
+build();scene();
+</script>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>El misterio geométrico del panal</title>
+<style>
+:root{--ink:#263238;--gold:#e8b323;--honey:#fff4cf;--green:#267653;--bg:#f7f8fa;--line:#dfe4e8}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{background:linear-gradient(120deg,#fff0b7,#f8d76d);padding:2rem 1rem;text-align:center}
+header h1{margin:.3rem auto;max-width:800px;font-size:clamp(1.8rem,4vw,3rem);line-height:1.15}
+header p{max-width:720px;margin:1rem auto}
+main{max-width:920px;margin:1.5rem auto;padding:0 1rem 3rem}
+section{background:white;border:1px solid var(--line);border-radius:16px;padding:1.25rem;margin:1rem 0;box-shadow:0 3px 12px #2632380b}
+h2{margin-top:0}button{border:0;border-radius:10px;padding:.7rem 1rem;background:var(--green);color:white;font-weight:700;cursor:pointer}
+button:disabled{opacity:.45;cursor:not-allowed}.secondary{background:#e9edf0;color:var(--ink)}
+progress{width:100%;height:10px;accent-color:var(--green)}
+.option{display:block;padding:.8rem;border:1px solid var(--line);border-radius:10px;margin:.5rem 0;cursor:pointer}
+.option:has(input:checked){background:#f0f7f3;border-color:var(--green)}
+.feedback{background:#f2f5f7;border-radius:10px;padding:1rem;margin-top:1rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
+table{width:100%;border-collapse:collapse;margin:.8rem 0}th,td{padding:.65rem;border-bottom:1px solid var(--line);text-align:left}
+input[type=range]{width:100%;accent-color:var(--green)}textarea{width:100%;min-height:120px;border:1px solid #bbc5cc;border-radius:10px;padding:.8rem;font:inherit}
+.hexes{font-size:clamp(2rem,6vw,4rem);letter-spacing:.1em;color:#bd8a00;text-align:center}
+.small{font-size:.9rem;color:#58666e}
+@media print{body{background:white}button{display:none}section{box-shadow:none;break-inside:avoid}}
+
+:root{--ink:#302b23;--gold:#c18a35;--honey:#f4e3bd;--green:#536c55;--bg:#f7f4ed;--line:#e8e0d2}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 "Aptos","Segoe UI",Arial,sans-serif}
+.hero{min-height:430px;position:relative;display:flex;align-items:center;padding:4rem 1.5rem;color:#fff;background:url("https://upload.wikimedia.org/wikipedia/commons/f/f3/Yellow-honeycomb-bees.jpg") center 48%/cover;isolation:isolate}
+.hero-shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(34,27,17,.82),rgba(34,27,17,.25) 78%);z-index:-1}
+.hero-content{width:min(920px,100%);margin:auto}
+.eyebrow{font-size:.72rem;letter-spacing:.2em;font-weight:700;color:#f4d89e;margin:0 0 1.1rem}
+.hero h1{font:400 clamp(2.5rem,6vw,4.8rem)/1.04 Georgia,"Times New Roman",serif;letter-spacing:-.035em;max-width:700px;margin:.2rem 0 1.25rem}
+.hero-content>p:not(.eyebrow){max-width:620px;font-size:1.08rem;color:#f6f1e8;margin:0 0 1.7rem}
+.hero-note{display:inline-block;border-top:1px solid #ffffff88;padding-top:.7rem;font-size:.68rem;letter-spacing:.16em;color:#f5dfb6}
+main{max-width:1040px;margin:2rem auto;padding:0 1.2rem 4rem}
+section{background:#fffefa;border:1px solid var(--line);border-radius:5px;padding:clamp(1.25rem,3vw,2rem);margin:1.25rem 0;box-shadow:0 8px 26px #4131190b}
+h2,h3{font-family:Georgia,"Times New Roman",serif;font-weight:400;letter-spacing:-.02em;color:#40382c}
+h2{font-size:1.65rem;margin:0 0 1rem}
+button{border:1px solid #536c55;border-radius:4px;padding:.78rem 1.15rem;background:#536c55;color:white;font-weight:650;cursor:pointer;transition:.2s}
+button:hover{background:#405744;transform:translateY(-1px)}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #d6ad68;outline-offset:2px}
+button:disabled{opacity:.45;cursor:not-allowed;transform:none}.secondary{background:#f0ede5;color:#4b463d;border-color:#d8d0c2}
+progress{width:100%;height:8px;accent-color:#71856b}
+.option{display:block;padding:.9rem 1rem;border:1px solid var(--line);border-radius:4px;margin:.55rem 0;cursor:pointer;background:white}
+.option:hover{border-color:#c5a46b;background:#fffdf8}.option:has(input:checked){background:#f6f2e8;border-color:#b68c4e}
+.feedback{background:#f6f2e9;border-left:3px solid #c18a35;border-radius:2px;padding:1rem 1.1rem;margin-top:1rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
+table{width:100%;border-collapse:collapse;margin:.8rem 0;background:white}th,td{padding:.8rem;border-bottom:1px solid var(--line);text-align:left}th{font-weight:650;color:#65563e;background:#faf7f0}
+input[type=range]{width:100%;accent-color:#a97935}
+textarea{width:100%;min-height:120px;border:1px solid #d9d0c0;border-radius:4px;padding:.9rem;font:inherit;background:#fffefa}
+.small{font-size:.9rem;color:#756d61}
+.honeycomb-visual{margin:1.2rem auto 1.6rem;max-width:680px;padding:1.2rem;background:linear-gradient(135deg,#fbf5e8,#f6ebd2);border:1px solid #eee1c5}
+.honeycomb-visual svg{display:block;width:100%;height:auto;max-height:200px}
+.photo-story{max-width:1040px;margin:0 auto 1.7rem;display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.photo-story figure{margin:0;overflow:hidden;background:#fffefa;border:1px solid var(--line);box-shadow:0 6px 20px #4131190d}
+.photo-story img{display:block;width:100%;height:155px;object-fit:cover;filter:saturate(.88) contrast(.98);transition:transform .5s}
+.photo-story figure:hover img{transform:scale(1.035)}
+.photo-story figcaption{padding:.85rem 1rem .95rem}.photo-story figcaption strong{display:block;font:400 1.08rem Georgia,serif}.photo-story figcaption span{display:block;color:#756d61;font-size:.84rem;line-height:1.45;margin-top:.25rem}
+footer{border-top:1px solid var(--line);padding-top:1.2rem;margin-top:2rem;color:#756d61}
+@media(max-width:680px){.hero{min-height:390px;padding:3.2rem 1.25rem;background-position:58% center}.photo-story{grid-template-columns:1fr;gap:.8rem}.photo-story figure{display:grid;grid-template-columns:118px 1fr}.photo-story img{height:100%;min-height:112px}.photo-story figcaption{padding:.8rem}}
+@media print{body{background:white}.hero{min-height:200px;padding:2rem}.hero-shade{background:#221b1199}button{display:none}section{box-shadow:none;break-inside:avoid}.photo-story{display:none}}
+
+</style>
+</head>
+<body>
+<header class="hero"><div class="hero-shade"></div><div class="hero-content">
+<p class="eyebrow">CIENCIA · GEOMETRÍA · NATURALEZA</p>
+<h1>El misterio geométrico del panal</h1>
+<p>Una mirada a la inteligencia de las abejas: descubre cómo la geometría, la eficiencia y la cooperación construyen algo extraordinario.</p>
+<span class="hero-note">RECURSO INTERACTIVO DE APRENDIZAJE</span>
+</div></header>
+<main>
+<div class="photo-story" aria-label="El panal en la naturaleza">
+<figure><img src="https://images.unsplash.com/photo-1587049352851-8d4e89133924?auto=format&fit=crop&w=900&q=85" alt="Detalle dorado de un panal" loading="lazy"><figcaption><strong>Una arquitectura natural</strong><span>La cera dibuja una estructura repetida y precisa.</span></figcaption></figure>
+<figure><img src="https://images.unsplash.com/photo-1471943311424-646960669fbc?auto=format&fit=crop&w=900&q=85" alt="Miel dorada en primer plano" loading="lazy"><figcaption><strong>Un recurso valioso</strong><span>La forma ayuda a aprovechar el espacio y los materiales.</span></figcaption></figure>
+<figure><img src="https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?auto=format&fit=crop&w=900&q=85" alt="Productos de la colmena" loading="lazy"><figcaption><strong>Trabajo colectivo</strong><span>Pequeñas aportaciones construyen un resultado común.</span></figcaption></figure>
+</div>
+<section>
+<h2>1. Reto de comprensión</h2>
+<p>Responde a las seis preguntas. Comprueba cada respuesta y lee la explicación.</p>
+<div id="quiz">
+<div class="small" id="progressText">Pregunta 1 de 6</div><progress id="progress" value="1" max="6"></progress>
+<h3 id="question"></h3><div id="options"></div><div id="feedback" class="feedback" hidden></div>
+<div style="display:flex;justify-content:space-between;gap:1rem;margin-top:1rem">
+<span id="score" class="small">Puntuación: 0</span><button id="check">Comprobar</button><button id="next" hidden>Siguiente</button>
+</div>
+</div>
+<div id="result" hidden><h3 id="resultTitle"></h3><p id="resultText"></p><button onclick="restartQuiz()">Repetir reto</button></div>
+</section>
+
+<section>
+<h2>2. Laboratorio de los hexágonos</h2>
+<p>Compara el perímetro de polígonos regulares que encierran una misma área. Modifica el área con el control deslizante.</p>
+<label for="area"><strong>Área de cada celda: <span id="areaValue">100</span> cm²</strong></label>
+<input id="area" type="range" min="25" max="400" step="25" value="100">
+<table><thead><tr><th>Figura</th><th>Perímetro aproximado</th></tr></thead><tbody>
+<tr><td>Triángulo equilátero</td><td id="tri"></td></tr>
+<tr><td>Cuadrado</td><td id="square"></td></tr>
+<tr><td>Hexágono regular</td><td id="hex"></td></tr>
+</tbody></table>
+<p id="labConclusion" class="feedback"></p>
+<p class="small">Modelo geométrico ideal: no considera el grosor de las paredes ni la estructura tridimensional del panal.</p>
+</section>
+
+<section>
+<h2>3. Construimos un panal cooperativo</h2>
+<div class="honeycomb-visual" role="img" aria-label="Estructura geométrica de celdas hexagonales">
+<svg viewBox="0 0 620 190" xmlns="http://www.w3.org/2000/svg">
+<defs><linearGradient id="wax" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f8df9b"/><stop offset="1" stop-color="#dca94f"/></linearGradient><filter id="soft"><feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#76521d" flood-opacity=".13"/></filter></defs>
+<g fill="url(#wax)" stroke="#b98535" stroke-width="2" filter="url(#soft)">
+<path d="M90 16 132 40 132 88 90 112 48 88 48 40Z"/><path d="M174 16 216 40 216 88 174 112 132 88 132 40Z"/><path d="M258 16 300 40 300 88 258 112 216 88 216 40Z"/><path d="M342 16 384 40 384 88 342 112 300 88 300 40Z"/><path d="M426 16 468 40 468 88 426 112 384 88 384 40Z"/><path d="M132 88 174 112 174 160 132 184 90 160 90 112Z"/><path d="M216 88 258 112 258 160 216 184 174 160 174 112Z"/><path d="M300 88 342 112 342 160 300 184 258 160 258 112Z"/><path d="M384 88 426 112 426 160 384 184 342 160 342 112Z"/>
+</g></svg></div>
+<p><strong>Misión de equipo:</strong> construid una estructura común con piezas hexagonales. Cada persona debe aportar una pieza y coordinarse con las demás.</p>
+<div class="grid">
+<div><h3>Fase 1 · Diseñar</h3><p>Dibujad un hexágono regular por participante.</p></div>
+<div><h3>Fase 2 · Construir</h3><p>Recortad las piezas y añadid un detalle que os identifique.</p></div>
+<div><h3>Fase 3 · Cooperar</h3><p>Unidlas para cubrir una superficie sin huecos.</p></div>
+<div><h3>Fase 4 · Analizar</h3><p>Retirad o girad una pieza. ¿Cómo afecta al conjunto?</p></div>
+</div>
+</section>
+
+<section>
+<h2>4. Reflexión final</h2>
+<label for="reflection"><strong>¿Qué podemos aprender de las abejas sobre la eficiencia, la geometría y el trabajo en equipo?</strong></label>
+<textarea id="reflection" placeholder="Mi conclusión es que..."></textarea>
+<p><button id="finishReflection">Finalizar reflexión</button> <button class="secondary" onclick="window.print()">Imprimir / Guardar como PDF</button></p>
+<div id="reflectionFeedback" class="feedback" hidden></div>
+</section>
+<section>
+<h2>Ideas clave del texto</h2>
+<ul>
+<li>El hexágono regular tesela el plano y encierra un área con poco perímetro.</li>
+<li>El fondo de las celdas está formado por tres rombos inclinados que encajan.</li>
+<li>En los encuentros de tres celdas, las paredes tienden a formar ángulos de 120°.</li>
+<li>Las pequeñas acciones de las abejas generan un patrón colectivo ordenado.</li>
+<li>La cooperación y el uso consciente de los recursos mejoran el resultado común.</li>
+</ul>
+</section>
+<footer class="small">Material de aula basado en el texto de trabajo sobre la geometría del panal. Fotografía de portada: Duckin, <a href="https://commons.wikimedia.org/wiki/File:Yellow-honeycomb-bees.jpg" target="_blank" rel="noopener">Wikimedia Commons</a>, licencia <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>.</footer>
+</main>
+<script>
+const questions=[
+{topic:"Comprensión lectora",q:"¿Cuál es la principal razón por la que las abejas construyen celdillas hexagonales?",a:["Porque el hexágono es la única figura que puede cubrir una superficie.","Porque permite encerrar una gran área utilizando poco material.","Porque las abejas pueden construirlo sin utilizar cera."],c:1,e:"El hexágono cubre una superficie sin huecos y encierra más área con menos perímetro que otras figuras regulares que teselan el plano."},
+{topic:"Geometría",q:"¿Qué polígonos regulares pueden cubrir una superficie sin dejar huecos?",a:["Triángulos equiláteros, cuadrados y hexágonos regulares.","Pentágonos, cuadrados y hexágonos.","Solo cuadrados y hexágonos."],c:0,e:"Los triángulos equiláteros, cuadrados y hexágonos regulares pueden cubrir el plano sin dejar huecos."},
+{topic:"Geometría espacial",q:"¿Cómo describe el texto el fondo de cada celda?",a:["Como una superficie plana cuadrada.","Como una pirámide de base triangular.","Como tres rombos inclinados que encajan con las celdas de la otra cara."],c:2,e:"Tres rombos inclinados forman el fondo de cada celda y permiten que las celdas de ambas caras encajen."},
+{topic:"Razonamiento",q:"En los puntos donde se encuentran tres celdas, ¿qué ángulo tienden a formar las paredes?",a:["90°","120°","180°"],c:1,e:"Las paredes tienden a formar ángulos de 120°, favoreciendo la estabilidad y continuidad."},
+{topic:"Pensamiento crítico",q:"¿Qué significa que el patrón del panal emerge de pequeñas acciones locales?",a:["Una abeja diseña toda la estructura antes de construirla.","Las abejas construyen sin relacionarse.","La cooperación de muchas abejas genera un patrón ordenado sin que una sola controle todo."],c:2,e:"Cada obrera realiza pequeñas acciones y ajusta su trabajo al entorno; la suma produce una estructura organizada."},
+{topic:"Aplicación",q:"¿Qué ejemplo humano refleja mejor la lección del panal?",a:["Un equipo en el que cada persona contribuye y coordina su trabajo.","Una persona que realiza todas las tareas.","Un grupo que utiliza más recursos para terminar antes."],c:0,e:"El texto destaca la cooperación, el uso eficiente de los recursos y la responsabilidad individual."}
+];
+let index=0,points=0,answered=false;
+const $=id=>document.getElementById(id);
+function render(){
+const q=questions[index];answered=false;
+$("progressText").textContent=`Pregunta ${index+1} de ${questions.length}`;
+$("progress").value=index+1;$("question").textContent=q.topic+" · "+q.q;
+$("options").innerHTML=q.a.map((x,i)=>`<label class="option"><input type="radio" name="answer" value="${i}"> ${String.fromCharCode(65+i)}. ${x}</label>`).join("");
+$("feedback").hidden=true;$("check").hidden=false;$("next").hidden=true;
+$("score").textContent=`Puntuación: ${points}/${index}`;
+}
+$("check").onclick=()=>{
+if(answered)return;const sel=document.querySelector('input[name="answer"]:checked');
+if(!sel){alert("Selecciona una respuesta.");return}
+answered=true;const q=questions[index],correct=+sel.value===q.c;if(correct)points++;
+$("feedback").hidden=false;$("feedback").innerHTML=`<strong>${correct?"¡Correcto!":"Respuesta para revisar."}</strong><br>${q.e}`;
+$("check").hidden=true;$("next").hidden=false;$("score").textContent=`Puntuación: ${points}/${index+1}`;
+};
+$("next").onclick=()=>{
+if(index<questions.length-1){index++;render()}else{
+$("quiz").hidden=true;$("result").hidden=false;
+$("resultTitle").textContent=`¡Reto completado! ${points}/${questions.length}`;
+$("resultText").textContent=points===6?"¡Excelente! Has comprendido la geometría y la inteligencia colectiva del panal.":points>=4?"¡Muy bien! Has comprendido las ideas principales.":"¡Buen trabajo! Repasa las explicaciones y vuelve a intentarlo.";
+}};
+function restartQuiz(){index=0;points=0;$("quiz").hidden=false;$("result").hidden=true;render()}
+const fmt=n=>n.toFixed(2)+" cm";
+function updateLab(){
+const A=+$("area").value;
+const tri=6*Math.sqrt(A/Math.sqrt(3)),square=4*Math.sqrt(A),hex=6*Math.sqrt(2*A/(3*Math.sqrt(3)));
+$("areaValue").textContent=A;$("tri").textContent=fmt(tri);$("square").textContent=fmt(square);$("hex").textContent=fmt(hex);
+$("labConclusion").textContent=`Para un área de ${A} cm², el hexágono necesita aproximadamente ${fmt(hex)} de perímetro, frente a ${fmt(square)} del cuadrado. El hexágono ahorra alrededor de ${((1-hex/square)*100).toFixed(1)}% de perímetro respecto al cuadrado.`;
+}
+$("area").addEventListener("input",updateLab);updateLab();render();
+$("finishReflection").onclick=()=>{
+const val=$("reflection").value.trim();if(val.length<10){alert("Escribe una conclusión de al menos 10 caracteres.");return}
+$("reflectionFeedback").hidden=false;$("reflectionFeedback").textContent="¡Reflexión completada! Tu conclusión: "+val;
+};
+</script>
+</body></html>

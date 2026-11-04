@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Matemáticas de las redes sociales – Recurso interactivo</title>
+<style>
+:root{font-family:Arial,sans-serif;color:#202938;background:#f4f6fa;--accent:#315cbd;--border:#dce2eb;--panel:#f0f3f8}
+*{box-sizing:border-box}body{margin:0;padding:20px}.app{max-width:900px;margin:auto;display:flex;flex-direction:column;gap:14px}
+.panel{background:white;border:1px solid var(--border);border-radius:14px;padding:16px}.muted{color:#64748b}.top{background:#eaf0ff}.top h1{font-size:24px;margin:5px 0}.tabs{display:flex;gap:7px;overflow-x:auto;padding-bottom:5px}.tab,button{cursor:pointer;border:1px solid var(--border);background:white;border-radius:9px;padding:9px 12px;font-size:14px}.tab.active{background:#e8efff;border-color:var(--accent);font-weight:bold}.primary{background:var(--accent);color:white;border-color:var(--accent)}.section{display:none;flex-direction:column;gap:12px}.section.active{display:flex}.metric{background:var(--panel);border-radius:9px;padding:12px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.choice{display:block;border:1px solid var(--border);border-radius:8px;padding:10px;margin-top:7px;font-size:14px}.feedback{background:var(--panel);padding:10px;border-radius:8px;font-size:14px;margin-top:9px}input:not([type=radio]),select,textarea{width:100%;padding:9px;border:1px solid var(--border);border-radius:8px;font:inherit}input[type=range]{padding:0}textarea{resize:vertical}label{line-height:1.5}button:disabled{opacity:.4;cursor:not-allowed}.node{cursor:pointer}.node circle{fill:white;stroke:var(--accent);stroke-width:2.5}.node text{fill:#202938;font-size:11px;text-anchor:middle;dominant-baseline:middle}.node.selected circle{fill:var(--accent)}.node.selected text{fill:white}.edge{stroke:#8793a6;stroke-width:2}.bar{height:12px;background:var(--accent);border-radius:8px}.progress{height:7px;background:#dce2eb;border-radius:8px;overflow:hidden}.progress>div{height:100%;background:var(--accent);transition:width .2s}table{border-collapse:collapse;width:100%;text-align:left}th,td{padding:9px;border-bottom:1px solid var(--border)}.nav{display:flex;justify-content:space-between;align-items:center;gap:10px}@media(max-width:520px){body{padding:10px}.grid{grid-template-columns:1fr}.top h1{font-size:21px}}
+@media print{body{background:white}.tabs,.nav,button{display:none!important}.section{display:none!important}#s6{display:flex!important}}
+
+:root{font-family:Inter,"Aptos","Segoe UI",Arial,sans-serif;color:#182333;background:#fbfbf9;--accent:#315f78;--border:#e5e9ed;--panel:#f5f6f4}
+body{background:linear-gradient(180deg,#f2f3f1 0,#fbfbf9 420px);padding:28px 20px}
+.app{max-width:1040px;gap:18px}
+.panel{border:1px solid rgba(24,35,51,.08);border-radius:18px;padding:22px;box-shadow:0 8px 28px rgba(24,35,51,.045)}
+.top{position:relative;overflow:hidden;min-height:270px;padding:36px;color:#fff;background:linear-gradient(90deg,rgba(13,27,39,.88),rgba(13,27,39,.42)),url("https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1800&q=88") center 44%/cover}
+.top .muted,.top p,.top small{color:rgba(255,255,255,.78)!important}
+.top h1{font-size:clamp(28px,4vw,42px);letter-spacing:-1.1px;max-width:650px;line-height:1.08;margin:14px 0}
+.top p{font-size:16px;max-width:520px}
+.top .progress{background:rgba(255,255,255,.25);margin-top:25px}
+.top .progress>div{background:#e4b68d}
+.tabs{gap:8px;padding:3px 0 8px}
+.tab,button{border-radius:999px;padding:10px 16px;border-color:#dfe4e5;background:#fff;color:#344253;transition:all .18s ease}
+.tab:hover,button:hover{border-color:#9eabb2;transform:translateY(-1px)}
+.tab.active{background:#243f50;color:#fff;border-color:#243f50}
+.primary{background:#243f50;color:#fff;border-color:#243f50}
+.primary:hover{background:#31566b}
+.section{gap:16px}
+.section h2{letter-spacing:-.35px;font-size:22px}
+.section p{line-height:1.65}
+.metric{background:#f4f5f2;border:1px solid #e8ebe7;border-radius:13px;padding:14px}
+.grid{gap:14px}
+.concept-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+.concept-card{overflow:hidden;padding:0!important;background:#fff!important}
+.concept-card img{display:block;width:100%;height:122px;object-fit:cover}
+.concept-card .concept-copy{padding:14px}
+.concept-card b{font-size:15px}
+.concept-card p{margin:6px 0 0;font-size:13px}
+.section .panel>h2:first-child{margin-top:0}
+.choice{border-radius:11px;background:#fff}
+.feedback{background:#f1f4f3;border:1px solid #e1e8e5;border-radius:11px}
+input:not([type=radio]),select,textarea{border-radius:10px;border-color:#d8dfdf;background:#fff;padding:11px}
+.node circle{stroke:#315f78}
+.node.selected circle{fill:#315f78}
+.edge{stroke:#a5b0b5}
+.feed-card{display:grid;grid-template-columns:112px minmax(0,1fr);gap:13px;align-items:center;background:#fff;border:1px solid #e7e9e6;border-radius:13px;overflow:hidden;margin:9px 0}
+.feed-card img{width:112px;height:88px;object-fit:cover}
+.feed-card .feed-copy{padding:8px 12px 8px 0}
+.feed-card strong{display:block;font-size:14px;margin-bottom:4px}
+.feed-card small{color:#74818a}
+#feed{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+#feed .feed-card{margin:0}
+#feed .feed-card img{height:100px}
+.nav{padding:4px 0}
+.nav button{min-width:120px}
+@media(max-width:700px){.concept-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.top{padding:26px;min-height:250px}}
+@media(max-width:520px){body{padding:10px}.panel{padding:16px}.concept-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#feed{grid-template-columns:1fr}.feed-card{grid-template-columns:100px minmax(0,1fr)}}
+
+</style>
+</head>
+<body>
+<div class="app" id="app">
+<header class="panel top">
+<div class="muted" style="font-size:12px;font-weight:bold">RECURSO EDUCATIVO INTERACTIVO</div>
+<h1>Las matemáticas de las redes sociales</h1><p class="muted">Descubre qué ocurre detrás de cada publicación.</p>
+<div class="progress"><div id="progress" style="width:14.28%"></div></div><small id="counter" class="muted">1/7</small>
+</header>
+<nav class="tabs" id="tabs">
+<button class="tab active" data-page="0">1. Introducción</button><button class="tab" data-page="1">2. Grafos</button><button class="tab" data-page="2">3. Influencia</button><button class="tab" data-page="3">4. Viralidad</button><button class="tab" data-page="4">5. Algoritmos</button><button class="tab" data-page="5">6. Datos</button><button class="tab" data-page="6">7. Evaluación</button>
+</nav>
+<section class="section active" id="s0">
+<div class="panel"><h2>1. Introducción: ¿qué matemáticas hay detrás?</h2><p>Las redes sociales son sistemas matemáticos formados por usuarios conectados, algoritmos y probabilidades.</p><div class="grid concept-grid">
+<div class="metric concept-card"><img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=85" alt="Personas conectadas mediante tecnología"><div class="concept-copy"><b>Grafos</b><p class="muted">Representan conexiones entre usuarios.</p></div></div>
+<div class="metric concept-card"><img src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=900&q=85" alt="Equipo colaborando"><div class="concept-copy"><b>Influencia</b><p class="muted">Mide la importancia dentro de la red.</p></div></div>
+<div class="metric concept-card"><img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=900&q=85" alt="Difusión y movimiento"><div class="concept-copy"><b>Viralidad</b><p class="muted">Explica cómo se difunde el contenido.</p></div></div>
+<div class="metric concept-card"><img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=900&q=85" alt="Tecnología y sistemas digitales"><div class="concept-copy"><b>Algoritmos</b><p class="muted">Seleccionan qué contenido aparece.</p></div></div>
+</div></div>
+<div class="panel"><b>Actividad inicial</b><p>¿Por qué un vídeo de una cuenta pequeña puede llegar a millones de personas?</p><textarea id="initial" rows="3" placeholder="Escribe tu hipótesis..."></textarea></div>
+<div class="panel"><b>Objetivos de aprendizaje</b><ul><li>Identificar nodos y aristas.</li><li>Calcular grados y comprender la centralidad.</li><li>Simular la propagación viral.</li><li>Resolver problemas de porcentajes.</li><li>Analizar algoritmos y burbujas de filtro.</li><li>Interpretar datos y evaluar resultados.</li></ul></div>
+</section>
+<section class="section" id="s1">
+<div class="panel"><h2>2. Grafos: construimos una red social</h2><p class="muted">Selecciona los nodos para descubrir su grado, es decir, su número de conexiones directas.</p>
+<svg viewBox="0 0 340 235" style="width:100%;max-height:270px" role="img" aria-label="Grafo de seis usuarios">
+<g class="edge"><line x1="55" y1="48" x2="155" y2="35"/><line x1="55" y1="48" x2="75" y2="145"/><line x1="155" y1="35" x2="245" y2="75"/><line x1="155" y1="35" x2="75" y2="145"/><line x1="75" y1="145" x2="175" y2="190"/><line x1="75" y1="145" x2="245" y2="75"/><line x1="245" y1="75" x2="275" y2="175"/><line x1="245" y1="75" x2="175" y2="190"/><line x1="175" y1="190" x2="275" y2="175"/></g>
+<g class="node" data-user="Ana"><circle cx="55" cy="48" r="22"/><text x="55" y="48">Ana</text></g><g class="node" data-user="Luis"><circle cx="155" cy="35" r="22"/><text x="155" y="35">Luis</text></g><g class="node" data-user="Marta"><circle cx="245" cy="75" r="22"/><text x="245" y="75">Marta</text></g><g class="node" data-user="Pablo"><circle cx="75" cy="145" r="22"/><text x="75" y="145">Pablo</text></g><g class="node" data-user="Sara"><circle cx="175" cy="190" r="22"/><text x="175" y="190">Sara</text></g><g class="node" data-user="Diego"><circle cx="275" cy="175" r="22"/><text x="275" y="175">Diego</text></g></svg>
+<div class="metric"><b id="node">Selecciona un nodo</b> · Grado: <strong id="degree">—</strong><p id="nodeinfo" class="muted">El número indica sus conexiones directas.</p></div><p class="muted">Círculo = nodo. Línea = arista.</p></div>
+<div class="panel"><b>Actividad 1. ¿Cuántas aristas tiene el grafo?</b><div class="grid" style="grid-template-columns:repeat(4,1fr);margin-top:10px"><button data-edge="7">7</button><button data-edge="8">8</button><button data-edge="9">9</button><button data-edge="10">10</button></div><div class="feedback" id="edgefb">Selecciona una respuesta.</div></div>
+<div class="panel"><b>Actividad 2. ¿Cuál es el grado de Marta?</b><div class="grid" style="grid-template-columns:1fr auto;margin-top:10px"><input id="degreeanswer" type="number" placeholder="Resultado"><button class="primary" id="degreecheck">Comprobar</button></div><div class="feedback" id="degreefb">Pista: cuenta sus conexiones.</div></div>
+</section>
+<section class="section" id="s2">
+<div class="panel"><h2>3. Influencia: no todos los seguidores influyen igual</h2><p>El grado cuenta las conexiones; la intermediación mide quién hace de puente entre comunidades; la cercanía mide la facilidad para llegar al resto; PageRank considera la relevancia de las cuentas que enlazan contigo.</p></div>
+<div class="panel"><b>Actividad 1. Centralidad</b><p>Una cuenta tiene pocos seguidores, pero conecta dos comunidades separadas. ¿Qué indicador es el más adecuado?</p>
+<label class="choice"><input type="radio" name="central" value="grado"> Grado</label><label class="choice"><input type="radio" name="central" value="inter"> Centralidad de intermediación</label><label class="choice"><input type="radio" name="central" value="cerca"> Centralidad de cercanía</label><label class="choice"><input type="radio" name="central" value="page"> PageRank</label><button class="primary" id="centralcheck" style="margin-top:10px">Comprobar</button><div class="feedback" id="centralfb">Selecciona una respuesta.</div></div>
+<div class="panel"><b>Actividad 2. PageRank simplificado</b><p class="muted">Ejemplo didáctico de puntuaciones de tres cuentas.</p><div class="grid"><div class="metric"><b>Cuenta A ⭐</b><h3>8 puntos</h3><small>4 recomendaciones relevantes</small></div><div class="metric"><b>Cuenta B</b><h3>5 puntos</h3><small>10 recomendaciones poco relevantes</small></div><div class="metric"><b>Cuenta C</b><h3>6 puntos</h3><small>6 recomendaciones medias</small></div></div><p>¿Qué cuenta obtiene mayor puntuación?</p><select id="pagerank"><option value="">Selecciona</option><option>A</option><option>B</option><option>C</option></select><button id="rankcheck" class="primary" style="margin-top:8px">Comprobar</button><div class="feedback" id="rankfb">Recuerda que importa la relevancia.</div><small class="muted">Puntuaciones ilustrativas, no un cálculo del PageRank real.</small></div>
+</section>
+<section class="section" id="s3">
+<div class="panel"><h2>4. Viralidad: simula una publicación</h2><p class="muted">Modifica los parámetros y observa cómo podría extenderse un contenido.</p></div>
+<div class="panel"><label><b>Contactos por persona: <span id="cv">4</span></b><input id="contacts" type="range" min="1" max="10" value="4"></label><label style="display:block;margin-top:16px"><b>Probabilidad de compartir: <span id="pv">50 %</span></b><input id="prob" type="range" min="0" max="100" step="5" value="50"></label><label style="display:block;margin-top:16px"><b>Rondas: <span id="sv">4</span></b><input id="steps" type="range" min="1" max="6" value="4"></label><div class="grid" style="margin-top:15px"><button class="primary" id="simulate">▶ Simular</button><button id="simreset">Reiniciar</button></div></div>
+<div class="panel"><b>Resultados</b><div class="grid" style="margin-top:10px"><div class="metric">Alcance acumulado<h2 id="total">1</h2></div><div class="metric">Nuevas exposiciones<h2 id="last">0</h2></div></div><div id="rounds" style="margin-top:12px" class="muted">Pulsa simular para empezar.</div><p class="muted"><small>Modelo simplificado de difusión esperada: ignora contactos repetidos y límites de población. Los decimales representan valores medios teóricos, no personas reales.</small></p></div>
+<div class="panel"><b>Reto de porcentajes</b><p>Una publicación llega a 200 personas. El 25 % la comparte. ¿Cuántas personas la comparten?</p><div class="grid" style="grid-template-columns:1fr auto"><input type="number" id="percentanswer" placeholder="Personas"><button class="primary" id="percentcheck">Comprobar</button></div><div class="feedback" id="percentfb">Calcula el 25 % de 200.</div></div>
+</section>
+<section class="section" id="s4">
+<div class="panel"><h2>5. Algoritmos: ¿por qué ves unas publicaciones y no otras?</h2><p>Los sistemas de recomendación pueden analizar el tiempo de visualización, las cuentas seguidas, los comentarios, los vídeos guardados y los contenidos compartidos.</p></div>
+<div class="panel"><b>Experimento: personaliza tu feed</b><p class="muted">Elige un interés y observa las recomendaciones simuladas.</p><select id="interest"><option value="cocina">Cocina</option><option value="deporte">Deporte</option><option value="ciencia">Ciencia</option></select><div id="feed" style="margin-top:10px"></div><div class="feedback" id="feedinfo">Observa los contenidos.</div></div>
+<div class="panel"><b>Actividad: burbuja de filtro</b><p>¿Qué riesgo tiene recibir casi exclusivamente contenidos similares a nuestras opiniones?</p><label class="choice"><input type="radio" name="bubble" value="a"> Conocer más puntos de vista.</label><label class="choice"><input type="radio" name="bubble" value="b"> Reducir la exposición a perspectivas diferentes.</label><label class="choice"><input type="radio" name="bubble" value="c"> Eliminar automáticamente los algoritmos.</label><button class="primary" id="bubblecheck" style="margin-top:10px">Comprobar</button><div class="feedback" id="bubblefb">Selecciona una respuesta.</div></div>
+<div class="panel"><b>Reflexiona</b><p>¿Qué dos acciones puedes realizar para evitar una burbuja de filtro?</p><textarea id="reflection" rows="3" placeholder="Escribe tus ideas..."></textarea></div>
+</section>
+<section class="section" id="s5">
+<div class="panel"><h2>6. Análisis de datos</h2><p>Estudia los datos de tres publicaciones ficticias.</p><div style="overflow-x:auto"><table><thead><tr><th>Publicación</th><th>Alcance</th><th>Compartidos</th></tr></thead><tbody><tr><td>A</td><td>1.000</td><td>100</td></tr><tr><td>B</td><td>2.000</td><td>300</td></tr><tr><td>C</td><td>500</td><td>75</td></tr></tbody></table></div><small class="muted">Datos inventados para fines educativos.</small></div>
+<div class="panel"><b>Actividad 1. Calcula porcentajes</b><p>¿Qué porcentaje de personas compartió la publicación B? Fórmula: (compartidos ÷ alcance) × 100.</p><div class="grid" style="grid-template-columns:1fr auto"><input type="number" id="rateanswer" placeholder="Porcentaje"><button class="primary" id="ratecheck">Comprobar</button></div><div class="feedback" id="ratefb">Calcula 300 ÷ 2.000 × 100.</div></div>
+<div class="panel"><b>Actividad 2. Compara alcances</b><p>¿Qué publicación llega a más personas?</p><select id="reachanswer"><option value="">Selecciona</option><option>A</option><option>B</option><option>C</option></select><button class="primary" id="reachcheck" style="margin-top:8px">Comprobar</button><div class="feedback" id="reachfb">Compara los tres alcances.</div></div>
+<div class="panel"><b>Actividad 3. Compara tasas</b><p>¿Qué publicaciones tienen la mayor proporción de compartidos?</p><select id="shareanswer"><option value="">Selecciona</option><option>A</option><option>B</option><option>C</option><option>B y C</option></select><button class="primary" id="sharecheck" style="margin-top:8px">Comprobar</button><div class="feedback" id="sharefb">Calcula los porcentajes.</div></div>
+<div class="panel"><b>Conclusión</b><textarea id="datareflection" rows="3" placeholder="¿Qué has descubierto al comparar los datos?"></textarea></div>
+</section>
+<section class="section" id="s6">
+<div class="panel"><h2>7. Evaluación</h2><p>Cuestionario autocorregible: ocho preguntas, un punto por acierto. Puedes repetirlo.</p><b>Puntuación máxima: 8 puntos</b></div>
+<form class="panel" id="quiz">
+<div><b>1. ¿Qué representa un nodo?</b><label class="choice"><input type="radio" name="q1" value="a"> Una persona o cuenta.</label><label class="choice"><input type="radio" name="q1" value="b"> Una publicación.</label><label class="choice"><input type="radio" name="q1" value="c"> Un algoritmo.</label></div>
+<div><b>2. ¿Qué es una arista?</b><label class="choice"><input type="radio" name="q2" value="a"> Un influencer.</label><label class="choice"><input type="radio" name="q2" value="b"> Una conexión entre nodos.</label><label class="choice"><input type="radio" name="q2" value="c"> Un porcentaje.</label></div>
+<div><b>3. ¿Qué mide el grado?</b><label class="choice"><input type="radio" name="q3" value="a"> Las conexiones directas.</label><label class="choice"><input type="radio" name="q3" value="b"> La edad.</label><label class="choice"><input type="radio" name="q3" value="c"> El tiempo de uso.</label></div>
+<div><b>4. ¿Qué es un hub?</b><label class="choice"><input type="radio" name="q4" value="a"> Una cuenta sin contactos.</label><label class="choice"><input type="radio" name="q4" value="b"> Una cuenta con pocas conexiones.</label><label class="choice"><input type="radio" name="q4" value="c"> Un nodo con muchas conexiones.</label></div>
+<div><b>5. ¿Qué influye en la viralidad?</b><label class="choice"><input type="radio" name="q5" value="a"> La probabilidad de compartir y la estructura de la red.</label><label class="choice"><input type="radio" name="q5" value="b"> Solo el número de palabras.</label><label class="choice"><input type="radio" name="q5" value="c"> El color.</label></div>
+<div><b>6. ¿Qué mide la intermediación?</b><label class="choice"><input type="radio" name="q6" value="a"> El número de publicaciones.</label><label class="choice"><input type="radio" name="q6" value="b"> La función de puente entre grupos.</label><label class="choice"><input type="radio" name="q6" value="c"> Los vídeos vistos.</label></div>
+<div><b>7. ¿Qué puede provocar una burbuja de filtro?</b><label class="choice"><input type="radio" name="q7" value="a"> Más diversidad siempre.</label><label class="choice"><input type="radio" name="q7" value="b"> La desaparición de algoritmos.</label><label class="choice"><input type="radio" name="q7" value="c"> Menos exposición a opiniones diferentes.</label></div>
+<div><b>8. El 10 % de 400 personas es...</b><label class="choice"><input type="radio" name="q8" value="a"> 4.</label><label class="choice"><input type="radio" name="q8" value="b"> 40.</label><label class="choice"><input type="radio" name="q8" value="c"> 400.</label></div>
+<button type="submit" class="primary" style="width:100%;margin-top:15px">Corregir cuestionario</button><button type="reset" style="width:100%;margin-top:8px">Repetir cuestionario</button>
+</form>
+<div class="panel" id="result" hidden><h2 id="score"></h2><b id="message"></b><div id="corrections" style="margin-top:12px"></div></div>
+<div class="panel"><h2>Ticket de salida</h2><p>Contesta las tres preguntas para demostrar lo que has aprendido.</p><label>1. ¿Qué concepto matemático has comprendido mejor?</label><textarea id="t1" rows="2"></textarea><label>2. ¿Qué te ha sorprendido de las redes sociales?</label><textarea id="t2" rows="2"></textarea><label>3. ¿Qué cambiarás en tu forma de utilizar las redes?</label><textarea id="t3" rows="2"></textarea><button class="primary" id="ticket" style="width:100%;margin-top:10px">Generar ticket</button><pre id="ticketresult" class="feedback" hidden style="white-space:pre-wrap"></pre><button id="print" hidden style="width:100%;margin-top:8px">Imprimir ticket</button></div>
+</section>
+<div class="nav"><button id="prev" disabled>← Anterior</button><span id="navlabel" class="muted">Introducción</span><button id="next" class="primary">Siguiente →</button></div>
+<p class="muted" style="text-align:center;font-size:12px">Recurso educativo · Matemáticas de las redes sociales</p>
+</div>
+<script>
+(function(){
+const $=id=>document.getElementById(id), sections=Array.from(document.querySelectorAll('.section')),tabs=Array.from(document.querySelectorAll('.tab'));
+const names=['Introducción','Grafos','Influencia','Viralidad','Algoritmos','Análisis de datos','Evaluación'];let page=0;
+function go(n){page=Math.max(0,Math.min(6,n));sections.forEach((s,i)=>s.classList.toggle('active',i===page));tabs.forEach((t,i)=>t.classList.toggle('active',i===page));$('progress').style.width=((page+1)/7*100)+'%';$('counter').textContent=(page+1)+'/7';$('navlabel').textContent=names[page];$('prev').disabled=page===0;$('next').textContent=page===6?'Inicio':'Siguiente →'}
+tabs.forEach(t=>t.addEventListener('click',()=>go(+t.dataset.page)));$('prev').onclick=()=>go(page-1);$('next').onclick=()=>go(page===6?0:page+1);
+const deg={Ana:2,Luis:3,Marta:4,Pablo:4,Sara:3,Diego:2};
+document.querySelectorAll('.node').forEach(n=>n.addEventListener('click',()=>{document.querySelectorAll('.node').forEach(x=>x.classList.remove('selected'));n.classList.add('selected');$('node').textContent=n.dataset.user;$('degree').textContent=deg[n.dataset.user];$('nodeinfo').textContent='Conexiones directas de '+n.dataset.user+'.'}));
+document.querySelectorAll('[data-edge]').forEach(b=>b.onclick=()=> $('edgefb').textContent=+b.dataset.edge===9?'¡Correcto! Hay 9 aristas.':'No es correcto. Cuenta cada línea una sola vez.');
+$('degreecheck').onclick=()=> $('degreefb').textContent=+$('degreeanswer').value===4?'¡Correcto! Marta tiene 4 conexiones.':'Marta está conectada con Luis, Pablo, Sara y Diego.';
+$('centralcheck').onclick=()=>{let v=document.querySelector('input[name=central]:checked');$('centralfb').textContent=v&&v.value==='inter'?'¡Correcto! La intermediación mide el papel de puente entre comunidades.':'La respuesta es centralidad de intermediación.'};
+$('rankcheck').onclick=()=> $('rankfb').textContent=$('pagerank').value==='A'?'¡Correcto! A tiene 8 puntos.':'La cuenta A obtiene la puntuación más alta: 8.';
+function sliders(){$('cv').textContent=$('contacts').value;$('pv').textContent=$('prob').value+' %';$('sv').textContent=$('steps').value}
+['contacts','prob','steps'].forEach(id=>$(id).addEventListener('input',sliders));
+$('simulate').onclick=()=>{let f=1,total=1,c=+$('contacts').value,p=+$('prob').value/100,s=+$('steps').value,html='';for(let i=1;i<=s;i++){f*=c*p;total+=f;html+='<p><b>Ronda '+i+':</b> '+f.toFixed(2)+' nuevas exposiciones</p><div style="background:#e5eaf2;border-radius:8px;overflow:hidden;margin:5px 0 12px"><div class="bar" style="width:'+Math.min(100,f/total*100)+'%"></div></div>'}$('total').textContent=total.toFixed(2);$('last').textContent=f.toFixed(2);$('rounds').innerHTML=html};
+$('simreset').onclick=()=>{$('contacts').value=4;$('prob').value=50;$('steps').value=4;sliders();$('total').textContent='1';$('last').textContent='0';$('rounds').textContent='Pulsa simular para empezar.'};
+$('percentcheck').onclick=()=> $('percentfb').textContent=+$('percentanswer').value===50?'¡Correcto! El 25 % de 200 es 50.':'Multiplica 200 por 0,25.';
+const feed={
+cocina:[['cocina','Receta de pasta','cocina'],['cocina','Ensaladas','cocina'],['deporte','Baloncesto','deporte'],['ciencia','Ciencia','ciencia'],['cocina','Postres','cocina']],
+deporte:[['deporte','Fútbol','deporte'],['deporte','Correr','deporte'],['cocina','Alimentación','cocina'],['deporte','Baloncesto','deporte'],['ciencia','Ciencia del movimiento','ciencia']],
+ciencia:[['ciencia','Universo','ciencia'],['ciencia','ADN','ciencia'],['cocina','Química en la cocina','cocina'],['ciencia','Física','ciencia'],['deporte','Estadísticas deportivas','deporte']]
+};
+function renderFeed(){let key=$('interest').value,items=feed[key],images={cocina:'https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&w=700&q=80',deporte:'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=700&q=80',ciencia:'https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=700&q=80'};$('feed').innerHTML=items.map(x=>'<article class="feed-card"><img loading="lazy" src="'+images[x[0]]+'" alt=""><div class="feed-copy"><strong>'+x[1]+'</strong><small>'+(x[2]===key?'Recomendado':'Otro tema')+'</small></div></article>').join('');$('feedinfo').textContent=items.filter(x=>x[2]===key).length+' de 5 publicaciones coinciden con tu interés.'}
+$('interest').onchange=renderFeed;renderFeed();
+$('bubblecheck').onclick=()=>{let v=document.querySelector('input[name=bubble]:checked');$('bubblefb').textContent=v&&v.value==='b'?'¡Correcto! Puede reducir la exposición a perspectivas diferentes.':'La respuesta correcta es reducir la exposición a perspectivas diferentes.'};
+$('ratecheck').onclick=()=> $('ratefb').textContent=+$('rateanswer').value===15?'¡Correcto! 300 ÷ 2.000 × 100 = 15 %.':'El resultado es 15 %.';
+$('reachcheck').onclick=()=> $('reachfb').textContent=$('reachanswer').value==='B'?'¡Correcto! B llega a 2.000 personas.':'La publicación B consigue el mayor alcance.';
+$('sharecheck').onclick=()=> $('sharefb').textContent=['B','C','B y C'].includes($('shareanswer').value)?'¡Correcto! B y C empatan con un 15 %.':'A = 10 %, B = 15 % y C = 15 %. Hay empate entre B y C.';
+const answers={q1:'a',q2:'b',q3:'a',q4:'c',q5:'a',q6:'b',q7:'c',q8:'b'},expl=['Un nodo representa una persona o cuenta.','Una arista es una conexión entre nodos.','El grado cuenta las conexiones directas.','Un hub tiene muchas conexiones.','La viralidad depende de las probabilidades y la estructura de la red.','La intermediación mide el papel de puente entre grupos.','Una burbuja puede limitar la diversidad de perspectivas.','El 10 % de 400 es 40.'];
+$('quiz').onsubmit=e=>{e.preventDefault();let score=0,html='';Object.keys(answers).forEach((q,i)=>{let v=document.querySelector('input[name='+q+']:checked'),ok=v&&v.value===answers[q];if(ok)score++;html+='<p><b>'+(i+1)+'. '+(ok?'✓ Correcta':'✗ Incorrecta')+'</b><br>'+expl[i]+'</p>'});$('score').textContent='Resultado: '+score+'/8';$('message').textContent=score===8?'¡Excelente!':score>=6?'¡Muy bien! Repasa los errores.':score>=4?'Buen comienzo. Puedes mejorar.':'Sigue practicando y vuelve a intentarlo.';$('corrections').innerHTML=html;$('result').hidden=false};
+$('quiz').onreset=()=>{$('result').hidden=true};
+$('ticket').onclick=()=>{let a=[$('t1').value.trim(),$('t2').value.trim(),$('t3').value.trim()];if(a.some(x=>!x)){$('ticketresult').hidden=false;$('ticketresult').textContent='Completa las tres preguntas.';return}$('ticketresult').textContent='TICKET DE SALIDA · MATEMÁTICAS DE LAS REDES SOCIALES\n\n1. Concepto aprendido: '+a[0]+'\n\n2. Lo que me ha sorprendido: '+a[1]+'\n\n3. Mi compromiso: '+a[2];$('ticketresult').hidden=false;$('print').hidden=false};
+$('print').onclick=()=>window.print();
+go(0);
+})();
+</script>
+</body></html>

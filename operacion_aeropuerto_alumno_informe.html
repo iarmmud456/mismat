@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Operación Aeropuerto | Laboratorio matemático</title>
+<style>
+:root{--navy:#102b46;--blue:#176b83;--ink:#17283b;--muted:#607386;--line:#d8e1e9;--paper:#fff;--bg:#f2f6f9;--accent:#e7a93b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{color:white;background:linear-gradient(120deg,rgba(9,32,54,.94),rgba(17,91,119,.88)),url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1800&q=85') center/cover;padding:54px 20px}
+.wrap{max-width:1050px;margin:auto;padding:0 18px}.eyebrow{text-transform:uppercase;letter-spacing:.16em;font-size:.78rem;font-weight:800;color:#f7cc72}
+h1{font-size:clamp(2rem,5vw,3.5rem);line-height:1.05;margin:.35em 0;color:white}header p{max-width:680px;font-size:1.1rem}
+main{padding:22px 0 60px}.card{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:22px;margin:18px 0;box-shadow:0 5px 20px #102b4609}
+h2{color:var(--navy);margin:0 0 12px;font-size:1.45rem}h3{margin:.2em 0 .5em;color:var(--navy)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+label{display:block;font-weight:650;margin:9px 0 5px}input,select,textarea{width:100%;border:1px solid #b9c7d3;border-radius:9px;padding:11px;font:inherit;background:#fff;color:var(--ink)}
+textarea{min-height:100px;resize:vertical}.muted{color:var(--muted);font-size:.94rem}
+.module{border:1px solid var(--line);border-radius:13px;padding:16px;background:#fbfdff}
+button{border:0;border-radius:9px;padding:11px 16px;background:var(--blue);color:white;font-weight:750;font:inherit;cursor:pointer;margin:8px 6px 0 0}
+button.secondary{background:#e8eef3;color:var(--navy)}button:hover{filter:brightness(1.06)}
+.result{padding:12px;border-radius:9px;background:#edf6f8;margin-top:10px;min-height:45px}
+.progress{height:8px;background:#e5edf2;border-radius:20px;overflow:hidden;margin:12px 0}.progress span{display:block;height:100%;width:0;background:var(--blue);transition:width .2s}
+.quiz-q{padding:12px 0;border-bottom:1px solid var(--line)}.quiz-q label{font-weight:450}
+footer{padding:20px;text-align:center;color:var(--muted);font-size:.88rem}
+@media(max-width:600px){header{padding:38px 0}.card{padding:16px}}
+@media print{body{background:#fff}.no-print,button{display:none!important}.card{box-shadow:none;break-inside:avoid}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><div class="eyebrow">Laboratorio matemático · 2.º ESO</div><h1>✈ Operación Aeropuerto</h1><p>Hoy formas parte del equipo de operaciones. Utiliza las matemáticas para organizar vuelos, pasajeros, equipajes y recursos durante una hora punta.</p></div></header>
+<main class="wrap">
+<section class="card" id="identidad"><h2>1. Identificación del alumno</h2><p class="muted">Completa tus datos. Se incorporarán al informe final que podrás descargar en tu dispositivo.</p><div class="grid">
+<div><label for="nombre">Nombre *</label><input id="nombre" autocomplete="given-name" required></div>
+<div><label for="apellidos">Apellidos *</label><input id="apellidos" autocomplete="family-name" required></div>
+<div><label for="curso">Curso y grupo *</label><input id="curso" placeholder="Ej. 2.º ESO B" required></div>
+<div><label for="fecha">Fecha</label><input id="fecha" type="date"></div>
+</div></section>
+
+<section class="card"><h2>2. Laboratorios de operaciones</h2><p class="muted">Resuelve cada situación. Pulsa «Calcular» para guardar el resultado en tu informe.</p><div class="grid">
+<div class="module"><h3>🛬 Capacidad de pista</h3><p>Una pista admite 18 operaciones por hora.</p><label for="pistaMin">Tiempo disponible (minutos)</label><input id="pistaMin" type="number" min="1" value="40"><button data-action="pista">Calcular</button><div class="result" id="res-pista" aria-live="polite">Pendiente de resolver.</div></div>
+<div class="module"><h3>🛂 Cola de seguridad</h3><p>Cada puesto revisa 12 pasajeros cada 10 minutos.</p><label for="puestos">Puestos abiertos</label><input id="puestos" type="number" min="1" value="3"><label for="pasajeros">Pasajeros en cola</label><input id="pasajeros" type="number" min="0" value="96"><button data-action="seguridad">Calcular</button><div class="result" id="res-seguridad" aria-live="polite">Pendiente de resolver.</div></div>
+<div class="module"><h3>🚪 Puertas de embarque</h3><p>Debes asignar una puerta a cada vuelo.</p><label for="vuelos">Vuelos</label><input id="vuelos" type="number" min="0" value="6"><label for="puertas">Puertas disponibles</label><input id="puertas" type="number" min="1" value="8"><button data-action="puertas">Calcular</button><div class="result" id="res-puertas" aria-live="polite">Pendiente de resolver.</div></div>
+<div class="module"><h3>🧳 Cinta de equipajes</h3><p>Una cinta procesa 240 maletas por hora.</p><label for="maletas">Maletas que llegan</label><input id="maletas" type="number" min="0" value="360"><button data-action="equipaje">Calcular</button><div class="result" id="res-equipaje" aria-live="polite">Pendiente de resolver.</div></div>
+<div class="module"><h3>⚖ Equilibrio de carga</h3><p>Compara los momentos de dos cargas respecto al punto de apoyo.</p><label for="cargaA">Carga A (kg)</label><input id="cargaA" type="number" value="120"><label for="distA">Distancia A (m)</label><input id="distA" type="number" value="2"><label for="cargaB">Carga B (kg)</label><input id="cargaB" type="number" value="80"><label for="distB">Distancia B (m)</label><input id="distB" type="number" value="3"><button data-action="equilibrio">Calcular</button><div class="result" id="res-equilibrio" aria-live="polite">Pendiente de resolver.</div></div>
+<div class="module"><h3>📊 Estadística de retrasos</h3><p>Calcula medidas estadísticas de los retrasos observados.</p><label for="datos">Retrasos en minutos (separados por comas)</label><input id="datos" value="5, 8, 12, 5, 10, 20"><button data-action="estadistica">Calcular</button><div class="result" id="res-estadistica" aria-live="polite">Pendiente de resolver.</div></div>
+</div></section>
+
+<section class="card"><h2>3. Misión integradora: hora punta</h2><p>Se esperan 420 pasajeros en un intervalo. Cada control puede revisar 35 pasajeros cada 15 minutos. Decide si la capacidad es suficiente.</p><div class="grid"><div><label for="controles">Controles abiertos</label><input id="controles" type="number" min="1" value="4"></div><div><label for="tiempo">Tiempo disponible (minutos)</label><input id="tiempo" type="number" min="1" value="45"></div></div><label for="justificacion">Justifica tu decisión con operaciones y unidades</label><textarea id="justificacion" placeholder="Explica cómo has calculado la capacidad y qué decisión propones..."></textarea><button data-action="mision">Comprobar misión</button><div class="result" id="res-mision" aria-live="polite">Pendiente de resolver.</div></section>
+
+<section class="card"><h2>4. Cuestionario de comprobación</h2><p class="muted">Selecciona una respuesta en cada pregunta y corrige al terminar.</p><div id="preguntas">
+<div class="quiz-q"><strong>1. Si una pista realiza 18 operaciones por hora, ¿cuántas realiza en media hora?</strong><label><input type="radio" name="q1" value="a"> 6</label><label><input type="radio" name="q1" value="b"> 9</label><label><input type="radio" name="q1" value="c"> 18</label></div>
+<div class="quiz-q"><strong>2. ¿Qué medida representa el valor medio de un conjunto de datos?</strong><label><input type="radio" name="q2" value="a"> Media aritmética</label><label><input type="radio" name="q2" value="b"> Rango</label><label><input type="radio" name="q2" value="c"> Máximo</label></div>
+<div class="quiz-q"><strong>3. Tres puestos revisan 12 pasajeros cada uno en el mismo intervalo. ¿Cuántos revisan en total?</strong><label><input type="radio" name="q3" value="a"> 12</label><label><input type="radio" name="q3" value="b"> 15</label><label><input type="radio" name="q3" value="c"> 36</label></div>
+<div class="quiz-q"><strong>4. Si conocemos la cantidad y el ritmo de trabajo, ¿cómo calculamos el tiempo?</strong><label><input type="radio" name="q4" value="a"> Cantidad ÷ ritmo</label><label><input type="radio" name="q4" value="b"> Cantidad × ritmo</label><label><input type="radio" name="q4" value="c"> Ritmo − cantidad</label></div>
+<div class="quiz-q"><strong>5. ¿Qué indica el rango de un conjunto de datos?</strong><label><input type="radio" name="q5" value="a"> El dato central</label><label><input type="radio" name="q5" value="b"> La diferencia entre máximo y mínimo</label><label><input type="radio" name="q5" value="c"> La suma de los datos</label></div>
+</div><button data-action="quiz">Corregir cuestionario</button><div class="result" id="res-quiz" aria-live="polite">Cuestionario pendiente.</div></section>
+
+<section class="card"><h2>5. Informe final individual</h2><p>Genera un informe con tus datos, los resultados de los laboratorios, tu justificación y la puntuación del cuestionario. Se guarda localmente en tu dispositivo.</p><div class="progress no-print"><span id="avance"></span></div><p class="muted no-print" id="estado">Has completado 0 de 8 apartados evaluables.</p><button class="no-print" data-action="informe">⬇ Generar y descargar informe (.txt)</button><button class="secondary no-print" data-action="imprimir">Imprimir / Guardar como PDF</button><div class="result" id="res-informe" aria-live="polite">Completa tu identificación y las actividades antes de generar el informe.</div></section>
+</main><footer>Recurso educativo · Operación Aeropuerto · Los datos se procesan en tu navegador y no se envían a ningún servidor.</footer>
+<script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id),v=id=>Number($(id).value||0),fmt=n=>Number(n.toFixed(2)).toLocaleString('es-ES');
+const data={};const labels={pista:'Capacidad de pista',seguridad:'Cola de seguridad',puertas:'Puertas de embarque',equipaje:'Cinta de equipajes',equilibrio:'Equilibrio de carga',estadistica:'Estadística de retrasos',mision:'Misión integradora'};
+function set(k,s){data[k]=s;$('res-'+k).textContent=s;updateProgress()}
+function updateProgress(){let count=Object.keys(labels).filter(k=>data[k]).length+(data.quiz?1:0);$('avance').style.width=(count/8*100)+'%';$('estado').textContent=`Has completado ${count} de 8 apartados evaluables.`}
+function checked(q){return document.querySelector('input[name="'+q+'"]:checked')?.value||'Sin responder'}
+$('fecha').value=new Date().toISOString().slice(0,10);
+document.addEventListener('click',e=>{const b=e.target.closest('[data-action]');if(!b)return;const a=b.dataset.action;
+if(a==='pista'){let n=v('pistaMin'),x=n*18/60;set(a,`${n} min × 18/60 = ${fmt(x)} operaciones (aprox. ${Math.floor(x)} operaciones completas).`)}
+if(a==='seguridad'){let rate=v('puestos')*12/10,mins=rate?v('pasajeros')/rate*10:0;set(a,`Ritmo conjunto: ${fmt(rate)} pasajeros/min. Tiempo estimado para ${v('pasajeros')} pasajeros: ${fmt(mins)} minutos.`)}
+if(a==='puertas'){let d=v('puertas')-v('vuelos');set(a,d>=0?`Hay ${d} puertas libres; todos los vuelos pueden recibir una puerta.`:`Faltan ${-d} puertas para asignar una a cada vuelo.`)}
+if(a==='equipaje'){set(a,`${v('maletas')} ÷ 240 × 60 = ${fmt(v('maletas')/240*60)} minutos.`)}
+if(a==='equilibrio'){let x=v('cargaA')*v('distA'),y=v('cargaB')*v('distB');set(a,`Momento A: ${fmt(x)} kg·m. Momento B: ${fmt(y)} kg·m. ${Math.abs(x-y)<.01?'Los momentos están equilibrados.':x>y?'Predomina el momento A.':'Predomina el momento B.'}`)}
+if(a==='estadistica'){let arr=$('datos').value.split(',').map(x=>Number(x.trim()));if(!arr.length||arr.some(x=>!Number.isFinite(x))){set(a,'Revisa los datos: introduce números separados por comas.');return}let mean=arr.reduce((s,x)=>s+x,0)/arr.length,min=Math.min(...arr),max=Math.max(...arr);set(a,`n=${arr.length}; media=${fmt(mean)} min; mínimo=${min} min; máximo=${max} min; rango=${max-min} min.`)}
+if(a==='mision'){let cap=v('controles')*35*v('tiempo')/15,need=420;set(a,`Capacidad: ${fmt(cap)} pasajeros. Demanda: ${need}. ${cap>=need?'Suficiente: margen de '+fmt(cap-need)+' pasajeros.':'Insuficiente: faltan '+fmt(need-cap)+' plazas de atención.'}`);data.justificacion=$('justificacion').value.trim()}
+if(a==='quiz'){let key={q1:'b',q2:'a',q3:'c',q4:'a',q5:'b'},score=0,lines=[];for(let q in key){let ans=checked(q),ok=ans===key[q];if(ok)score++;lines.push(`${q.toUpperCase()}: ${ans}; correcta: ${key[q]}; ${ok?'correcta':'incorrecta'}`)}data.quizScore=score;data.quiz=lines.join('\n');set('quiz',`Puntuación: ${score}/5. ${score===5?'¡Excelente!':score>=3?'Buen trabajo.':'Revisa los conceptos y vuelve a intentarlo.'}`)}
+if(a==='informe'){let name=$('nombre').value.trim(),surname=$('apellidos').value.trim(),course=$('curso').value.trim();if(!name||!surname||!course){$('res-informe').textContent='Completa nombre, apellidos y curso/grupo para identificar el informe.';$('identidad').scrollIntoView({behavior:'smooth'});return}
+let lines=['OPERACIÓN AEROPUERTO — INFORME INDIVIDUAL','==========================================',`Alumno/a: ${name} ${surname}`,`Curso y grupo: ${course}`,`Fecha: ${$('fecha').value||new Date().toLocaleDateString('es-ES')}`,'','RESULTADOS DE LAS ACTIVIDADES','-----------------------------'];for(let k of Object.keys(labels))lines.push(`${labels[k]}: ${data[k]||'No realizada'}`);lines.push('','JUSTIFICACIÓN DE LA MISIÓN','--------------------------',$('justificacion').value.trim()||'No escrita','','CUESTIONARIO','------------',data.quiz||'No corregido',`Puntuación: ${data.quizScore??'—'}/5`,'','Fin del informe.');let blob=new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='informe-operacion-aeropuerto-'+name.toLowerCase().replace(/[^a-z0-9]+/g,'-')+'.txt';document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);$('res-informe').textContent='Informe generado. Busca el archivo en la carpeta Descargas.'}
+if(a==='imprimir'){window.print()}
+});
+})();
+</script>
+</body></html>

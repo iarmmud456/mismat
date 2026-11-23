@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>El misterio de la caja perfecta · Aventura matemática</title>
+<style>
+:root{--bg:#081521;--panel:#102638;--panel2:#16364b;--line:#29516a;--text:#edf7ff;--muted:#aac4d5;--cyan:#64e3ee;--gold:#ffd36b;--green:#69e5a4;--red:#ff8290;--purple:#b9a4ff}
+*{box-sizing:border-box}body{margin:0;color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:radial-gradient(ellipse at 15% 0%,#153a50 0,transparent 38%),radial-gradient(ellipse at 85% 15%,#25304f 0,transparent 30%),linear-gradient(140deg,#06111c,#0b1c2b 55%,#071521);min-height:100vh}
+header{padding:30px 20px 22px;text-align:center;position:relative;overflow:hidden;border-bottom:1px solid #21445a}
+.kicker{color:var(--cyan);letter-spacing:.16em;text-transform:uppercase;font-size:.75rem;font-weight:800}
+h1{font-size:clamp(1.8rem,4vw,3.1rem);line-height:1.08;margin:.45em auto;max-width:900px}
+header p{color:var(--muted);max-width:720px;margin:0 auto}
+.shell{max-width:1180px;margin:auto;padding:22px}
+.topbar{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:12px;margin-bottom:16px}
+.field,.stat,.card{background:linear-gradient(160deg,rgba(20,49,70,.96),rgba(10,30,46,.96));border:1px solid var(--line);border-radius:16px;padding:14px}
+label{display:block;color:var(--muted);font-size:.82rem;margin-bottom:6px}
+input,select{background:#071925;border:1px solid #31556b;color:var(--text);border-radius:10px;padding:10px;width:100%;font:inherit}
+.dashboard{display:grid;grid-template-columns:1.3fr 2fr 1fr;gap:12px;margin-bottom:18px}
+.stat strong{font-size:1.5rem;display:block}.stat small{color:var(--muted)}
+.progress{height:9px;border-radius:20px;background:#061722;overflow:hidden;margin-top:9px}.bar{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--green));transition:width .4s}
+.layout{display:grid;grid-template-columns:300px 1fr;gap:18px;align-items:start}
+aside{position:sticky;top:12px}.card{margin-bottom:14px}
+.mission-list{display:grid;gap:8px}.mission{border:1px solid #294b60;border-radius:12px;padding:10px 12px;background:#0a1e2c;color:var(--muted);display:flex;gap:10px;align-items:center}
+.mission.active{border-color:var(--cyan);color:var(--text);box-shadow:0 0 0 1px #64e3ee30}.mission.done{border-color:#368c69;color:var(--green)}
+.badge{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#193b51;font-weight:800}
+.challenge h2{margin:0 0 6px;font-size:1.45rem}.challenge .sub{color:var(--muted);margin-top:0}
+.challenge-body{font-size:1.02rem;line-height:1.65}
+.math{display:inline-block;padding:8px 12px;background:#071b28;border:1px solid #28506a;border-radius:10px;color:#baf8ff;font-family:ui-monospace,Consolas,monospace;font-size:1.05rem;margin:5px 0}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.row>*{flex:1;min-width:120px}
+.btn{border:0;border-radius:11px;padding:11px 16px;font:inherit;font-weight:800;cursor:pointer;transition:.15s}.btn:hover{transform:translateY(-1px)}.primary{background:linear-gradient(120deg,#42c8db,#72e6b2);color:#06202a}.secondary{background:#19384c;color:var(--text);border:1px solid #34566c}.gold{background:linear-gradient(120deg,#f4bd53,#ffdf8d);color:#33230a}.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.feedback{margin:12px 0;padding:12px;border-radius:12px;display:none}.feedback.show{display:block}.feedback.good{background:#123c31;border:1px solid #2b8b66;color:#b7ffdb}.feedback.bad{background:#48232c;border:1px solid #a64b5c;color:#ffd0d7}.hint{background:#142c3e;border:1px dashed #52748a;color:#d7e8f3;padding:12px;border-radius:12px;margin-top:10px;display:none}
+.visual{background:#071722;border-radius:14px;border:1px solid #24485d;padding:12px;margin:14px 0}.visual-head{display:flex;justify-content:space-between;gap:10px;align-items:center;color:var(--muted);font-size:.85rem}.visual canvas{width:100%;height:300px;display:block}.legend{display:flex;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:.82rem}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}
+.controls{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:8px}.controls label{font-size:.8rem}.controls input[type=range]{padding:0;accent-color:var(--cyan)}
+.live{margin-top:12px;background:#0a1e2c;border:1px solid #24485d;border-radius:12px;padding:12px;font-size:.92rem;line-height:1.6}.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}.chip{padding:3px 9px;border-radius:20px;background:#142c3e;border:1px solid #34566c;color:var(--muted);font-size:.82rem;font-weight:700}.chip.int{background:#123c31;border-color:#2b8b66;color:#b7ffdb}.up{color:var(--green);font-weight:800}.down{color:var(--red);font-weight:800}label.auto{display:flex;gap:8px;align-items:center;margin-top:12px;color:var(--text);font-size:.9rem}label.auto input{width:auto}.controls input:disabled{opacity:1;accent-color:var(--gold)}
+.result{font-size:1.15rem;color:var(--gold);font-weight:800}
+.footer-actions{display:flex;justify-content:space-between;gap:10px;margin-top:18px;flex-wrap:wrap}
+small.note{color:var(--muted)}.end{display:none}.end.show{display:block}.confetti{font-size:1.6rem}
+@media(max-width:850px){.layout{grid-template-columns:1fr}aside{position:static}.dashboard{grid-template-columns:1fr 1fr}.topbar{grid-template-columns:1fr 1fr}.topbar .field:first-child{grid-column:1/-1}}
+@media(max-width:540px){.shell{padding:12px}.dashboard,.topbar{grid-template-columns:1fr}.controls{grid-template-columns:1fr}.visual canvas{height:250px}}
+@media print{body{background:white;color:#111}.shell,header{max-width:100%;background:white;color:#111}.card,.field,.stat{background:white;color:#111;border:1px solid #bbb;box-shadow:none}aside,.visual,.footer-actions,.mission-list,.dashboard,.topbar input,.btn,.challenge,.end:not(.show){display:none!important}.layout{display:block}.end.show{display:block!important}.print-summary{display:block}.feedback{display:none}header p,.kicker{color:#333}}
+
+.hero{width:min(680px,94%);height:auto;display:block;margin:0 auto 4px}.boxfloat{animation:fl 5s ease-in-out infinite}@keyframes fl{50%{transform:translateY(-9px)}}.flow{animation:dash 1s linear infinite}@keyframes dash{to{stroke-dashoffset:-16}}
+@media(prefers-reduced-motion:reduce){.boxfloat,.flow{animation:none}}
+header{background:radial-gradient(ellipse at 50% 30%,rgba(100,227,238,.12),transparent 60%)}
+.idcard{margin-bottom:14px;background:rgba(16,38,56,.8);border:1px solid var(--line);border-radius:14px;padding:4px 14px}.idcard summary{cursor:pointer;padding:10px 0;font-weight:700;color:var(--cyan)}.idcard summary small{color:var(--muted);font-weight:400}.idcard .topbar{margin:6px 0 12px}.idcard .field{padding:10px}
+.steps{display:flex;gap:6px;margin-bottom:10px}.step{flex:1;height:7px;border-radius:9px;background:#1c3d52}.step.on{background:var(--cyan);box-shadow:0 0 10px #64e3ee80}.step.ok{background:var(--green)}
+.story{border-left:4px solid var(--gold);background:linear-gradient(90deg,rgba(255,211,107,.12),transparent);padding:10px 14px;border-radius:0 12px 12px 0;margin:10px 0 14px;font-style:italic;color:#ffeab5;line-height:1.55}
+.challenge input,.challenge select{font-size:1.2rem;text-align:center;border:2px solid #3b6f8a;background:#05131d;border-radius:14px;padding:14px}.challenge input:focus,.challenge select:focus{outline:0;border-color:var(--cyan);box-shadow:0 0 0 4px rgba(100,227,238,.2)}
+.challenge .row label{color:var(--cyan);font-weight:700}
+@media(max-width:850px){.layout{display:flex;flex-direction:column}main{order:1}aside{order:2}aside .card:nth-child(2){display:none}.dashboard{grid-template-columns:1fr 1.5fr 1fr;gap:8px}.stat{padding:9px 10px}.stat strong{font-size:1.05rem}.stat small{font-size:.68rem}.shell{padding:12px}header{padding:14px 14px 12px}h1{font-size:1.55rem}header p{font-size:.92rem}}
+@media(max-width:540px){.dashboard{grid-template-columns:1fr 1.5fr 1fr!important}.footer-actions{position:sticky;bottom:0;z-index:5;margin:14px -14px -14px;padding:10px 14px;background:linear-gradient(0deg,#0a1e2c 75%,transparent);border-radius:0 0 16px 16px}#checkBtn{flex:1 1 100%;order:1}#hintBtn,#nextBtn{flex:1 1 40%;order:2}.challenge h2{font-size:1.25rem}}
+@media print{.idcard,.hero{display:none!important}}
+.gstep{display:flex;gap:8px;align-items:center;margin:6px 0;flex-wrap:wrap}.gstep span{flex:1;min-width:150px;font-family:ui-monospace,Consolas,monospace}.challenge .gstep input{width:110px;padding:6px;font-size:1rem;border-width:1px;border-radius:9px}.gstep input.ok{border-color:var(--green)!important}.gstep em{font-style:normal;color:var(--green);width:1.3em}.gend{margin-top:8px;color:var(--gold)}.hl{padding:8px 0;border-bottom:1px dashed #52748a}.hl:last-child{border:0}.pulse{animation:pl 1.2s infinite}@keyframes pl{50%{box-shadow:0 0 0 6px rgba(255,211,107,.35)}}
+.stp{display:flex;gap:6px;align-items:center}.stp input{flex:1;min-width:0}.btn.sb{width:36px;height:36px;padding:0;font-size:1.25rem;line-height:1;flex:none;touch-action:manipulation;user-select:none}.btn.sb:disabled{opacity:.35}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;margin-bottom:10px}.fcard{background:#071b28;border:1px solid;border-radius:10px;padding:8px 10px;font-family:ui-monospace,Consolas,monospace;font-size:.82rem;line-height:1.5}.fh{font-weight:800;font-family:system-ui,sans-serif}.fr{font-weight:800;font-size:1rem;margin-top:2px}
+</style>
+</head>
+<body>
+<header>
+<svg class="hero" viewBox="0 0 900 330" role="img" aria-label="Caja geométrica luminosa con sus diagonales">
+<defs><radialGradient id="hg" cx="50%" cy="55%" r="55%"><stop offset="0" stop-color="#64e3ee" stop-opacity=".5"/><stop offset="1" stop-color="#64e3ee" stop-opacity="0"/></radialGradient>
+<linearGradient id="ht" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b9a4ff"/><stop offset="1" stop-color="#64e3ee"/></linearGradient>
+<linearGradient id="hl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d6a86"/><stop offset="1" stop-color="#0b2e45"/></linearGradient>
+<linearGradient id="hr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b4f9c"/><stop offset="1" stop-color="#0d1f45"/></linearGradient>
+<filter id="hglow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+<ellipse cx="450" cy="190" rx="340" ry="150" fill="url(#hg)"/>
+<g stroke="#29516a" fill="none" opacity=".75"><ellipse cx="450" cy="288" rx="250" ry="38"/><ellipse cx="450" cy="288" rx="170" ry="26"/><ellipse cx="450" cy="288" rx="95" ry="14"/><path d="M200 288H700M450 250V326M270 264L630 312M630 264L270 312"/></g>
+<g fill="#aac4d5" font-family="Arial,sans-serif" font-weight="700" opacity=".5"><text x="70" y="85" font-size="30">3 · 4 · 5</text><text x="720" y="70" font-size="28">125</text><text x="95" y="245" font-size="26">244</text><text x="745" y="250" font-size="30">267</text><text x="640" y="165" font-size="20">44·117·240</text></g>
+<g fill="#fff" opacity=".7"><circle cx="150" cy="150" r="2"/><circle cx="260" cy="40" r="2.5"/><circle cx="800" cy="130" r="2"/><circle cx="690" cy="30" r="2"/><circle cx="60" cy="190" r="1.8"/><circle cx="850" cy="200" r="2.4"/></g>
+<g class="boxfloat">
+<polygon points="450,40 590,110 450,180 310,110" fill="url(#ht)" fill-opacity=".85" stroke="#dffbff" stroke-width="2.5" stroke-linejoin="round"/>
+<polygon points="310,110 450,180 450,270 310,200" fill="url(#hl)" stroke="#64e3ee" stroke-width="2.5" stroke-linejoin="round"/>
+<polygon points="450,180 590,110 590,200 450,270" fill="url(#hr)" stroke="#64e3ee" stroke-width="2.5" stroke-linejoin="round"/>
+<g filter="url(#hglow)" fill="none" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="9 7"><line x1="310" y1="110" x2="590" y2="110" stroke="#ffd36b"/><line x1="310" y1="110" x2="450" y2="270" stroke="#69e5a4"/><line x1="450" y1="180" x2="590" y2="200" stroke="#b9a4ff"/><line class="flow" x1="590" y1="110" x2="310" y2="200" stroke="#ff8290" stroke-width="4.5" stroke-dasharray="3 5"/></g>
+<text x="450" y="162" text-anchor="middle" font-family="Arial" font-size="40" font-weight="800" fill="#fff" stroke="#071722" stroke-width="5" paint-order="stroke">?</text></g></svg>
+<div class="kicker">Expediente nº 1772 · misión interactiva</div>
+<h1>🔎 El misterio de la caja perfecta</h1>
+<p>1772. Llega al Archivo Pitagórico una caja con una nota de Euler: «Sus aristas y las diagonales de sus caras son números enteros. ¿Y el hilo que la atraviesa de esquina a esquina?». Eres el investigador o investigadora del caso: abre el archivo, mide, experimenta y descubre qué sabemos… y qué sigue siendo un misterio.</p>
+</header>
+<div class="shell">
+<details class="idcard"><summary>🪪 Ficha del investigador <small>(nombre, curso y fecha para el informe)</small></summary><div class="topbar">
+<div class="field"><label for="student">Nombre / equipo investigador</label><input id="student" placeholder="Escribe tu nombre o equipo"></div>
+<div class="field"><label for="course">Curso</label><input id="course" placeholder="Ej. 3.º ESO / 4.º ESO"></div>
+<div class="field"><label for="date">Fecha</label><input id="date" type="date"></div>
+</div></details>
+<div class="dashboard">
+<div class="stat"><strong id="score">0 / 10</strong><small>Puntuación</small></div>
+<div class="stat"><strong id="progressText">0 de 5 retos</strong><small>Progreso de la investigación<div class="progress"><div class="bar" id="bar"></div></div></small></div>
+<div class="stat"><strong id="streak">0 🔥</strong><small>Retos superados sin error</small></div>
+</div>
+<div class="layout">
+<aside>
+<div class="card"><h3 style="margin-top:0">🗺️ Mapa del caso</h3><div class="mission-list" id="missionList"></div></div>
+<div class="card"><h3 style="margin-top:0">🧭 Pistas del investigador</h3><p style="color:var(--muted);margin-bottom:0">Tienes 3 niveles de ayuda: orientación, estrategia y resolución guiada. La orientación no resta puntos; la estrategia y la resolución guiada sí.</p></div>
+</aside>
+<main>
+<section class="card challenge" id="challenge">
+<div class="steps" id="steps"></div><h2 id="challengeTitle">Reto 1 · La puerta de entrada</h2><p class="sub" id="challengeSub">Comprueba que una diagonal puede ser entera.</p>
+<div class="story" id="story"></div><div id="challengeContent" class="challenge-body"></div>
+<div class="feedback" id="feedback"></div><div class="hint" id="hint"></div>
+<div class="footer-actions"><button class="btn secondary" id="hintBtn">💡 Pedir pista</button><button class="btn primary" id="checkBtn">Comprobar respuesta</button><button class="btn gold" id="nextBtn" disabled>Siguiente reto →</button></div>
+</section>
+<section class="card visual" id="visualPanel">
+<div class="visual-head"><span>📐 Simulador geométrico</span><span id="dimensions"></span></div>
+<svg id="cuboidSvg" viewBox="0 0 900 360" role="img" aria-label="Cuboide dinámico con diagonales" style="width:100%;height:auto;display:block;min-height:240px"></svg>
+<div class="legend"><span><i class="dot" style="background:#64e3ee"></i>Aristas a, b, c</span><span><i class="dot" style="background:#ffd36b"></i>d₁ (cara a×b)</span><span><i class="dot" style="background:#69e5a4"></i>d₂ (cara a×c)</span><span><i class="dot" style="background:#b9a4ff"></i>d₃ (cara b×c)</span><span><i class="dot" style="background:#ff8290"></i>D (diagonal espacial)</span></div>
+<div class="controls"><div><label>a: <span id="av">3</span></label><div class="stp"><button type="button" class="btn secondary sb" data-t="a" data-d="-1" aria-label="Restar 1 a a">−</button><input type="range" id="a" min="1" max="800" value="3"><button type="button" class="btn secondary sb" data-t="a" data-d="1" aria-label="Sumar 1 a a">+</button></div></div><div><label>b: <span id="bv">4</span></label><div class="stp"><button type="button" class="btn secondary sb" data-t="b" data-d="-1" aria-label="Restar 1 a b">−</button><input type="range" id="b" min="1" max="800" value="4"><button type="button" class="btn secondary sb" data-t="b" data-d="1" aria-label="Sumar 1 a b">+</button></div></div><div><label>c: <span id="cv">5</span></label><div class="stp"><button type="button" class="btn secondary sb" data-t="c" data-d="-1" aria-label="Restar 1 a c">−</button><input type="range" id="c" min="1" max="800" step="1" value="5"><button type="button" class="btn secondary sb" data-t="c" data-d="1" aria-label="Sumar 1 a c">+</button></div></div></div>
+
+<div class="live" id="live"></div>
+<button class="btn secondary" id="zoomOut" type="button" aria-label="Alejar" style="padding:6px 12px;font-size:.8rem;margin:8px 4px 8px 0">➖</button><button class="btn secondary" id="zoomIn" type="button" aria-label="Ampliar" style="padding:6px 12px;font-size:.8rem;margin:8px 8px 8px 0">➕</button><button class="btn secondary" id="resetView" type="button" style="padding:6px 12px;font-size:.8rem;margin:8px 8px 8px 0">🔄 Restablecer vista</button> <small class="note">Arrastra la caja con el dedo o el ratón para girarla; pellizca con dos dedos (o usa la rueda o ➕ ➖) para ampliarla. Mueve a, b y c para cambiar las tres aristas. En el panel verás cómo cambia sola la diagonal d₁ de la cara a × b. Para ajustar con precisión, selecciona un deslizador y usa las flechas del teclado.</small>
+</section>
+<section class="card end" id="final">
+<h2>🏁 Informe final de la investigación</h2><div id="report"></div><p class="print-summary">Imprime este informe o elige «Guardar como PDF» en el diálogo de impresión del navegador.</p>
+<button class="btn gold" onclick="window.print()">🖨️ Descargar / imprimir informe PDF</button>
+<button class="btn secondary" onclick="location.reload()">🔁 Volver a jugar</button>
+</section>
+</main></div>
+</div>
+<script>
+const missions=[
+{title:"Reto 1 · La puerta de entrada",story:"🔑 La puerta del archivo está sellada. La cerradura solo cede ante la diagonal de un rectángulo de 3 × 4: la pieza más pequeña del enigma.",sub:"Encuentra una diagonal entera",html:`<p>Un rectángulo tiene lados de <b>3</b> y <b>4</b> unidades. ¿Cuánto mide su diagonal? Usa el teorema de Pitágoras.</p><div class="math">d² = 3² + 4²</div><div class="row"><label>Diagonal (unidades)<input id="answer" type="number" placeholder="Tu resultado"></label></div>`,hint:"Calcula 9 + 16 y busca el número cuyo cuadrado sea 25.",hints:["¿Qué teorema relaciona los lados de un triángulo rectángulo? Piensa en la diagonal como la hipotenusa.","Identifica los dos catetos (3 y 4), calcula sus cuadrados y súmalos. Ese resultado es d², todavía no d."],guide:[["3² =",9],["4² =",16],["9 + 16 =",25],["d = √25 =",5]],end:"Escribe ese último resultado en la casilla de respuesta.",diag:v=>{const n=Number(v.answer);if(v.answer==="")return"Escribe un número en la casilla.";if(n===25)return"25 es d², la suma de los cuadrados: falta hacer la raíz cuadrada.";if(n===7)return"Has sumado 3 + 4. En Pitágoras se suman los cuadrados de los catetos, no los catetos.";if(n===12)return"Has multiplicado 3 × 4. El teorema suma los cuadrados: 3² + 4².";return null},check:v=>Number(v.answer)===5,sim:{a:3,b:4,c:5},success:"¡Correcto! 3, 4 y 5 forman una terna pitagórica. Has encontrado la primera pista.",explain:"√(3² + 4²) = √25 = 5.",points:2},
+{title:"Reto 2 · El cuboide de Euler",story:"📦 Dentro reposa la caja de Euler, de 44 × 117 × 240. Para entrar en la sala interior debes verificar los tres sellos grabados en sus caras.",sub:"Verifica las tres diagonales de las caras",html:`<p>La caja de Euler conocida tiene dimensiones <b>44 × 117 × 240</b>. Comprueba sus diagonales de cara. <small class="note">Prueba en el simulador: pon a = 44, b = 117 y c = 240.</small></p><p class="math">√(44² + 117²) = ? &nbsp; · &nbsp; √(44² + 240²) = ? &nbsp; · &nbsp; √(117² + 240²) = ?</p><div class="row"><label>Diagonal 1<input id="x1" type="number" placeholder="44–117"></label><label>Diagonal 2<input id="x2" type="number" placeholder="44–240"></label><label>Diagonal 3<input id="x3" type="number" placeholder="117–240"></label></div>`,hint:"Las diagonales son 125, 244 y 267. Puedes calcular cada raíz con Pitágoras.",hints:["Cada diagonal de cara es la hipotenusa de un triángulo rectángulo cuyos catetos son dos aristas: 44–117, 44–240 y 117–240.","Para cada pareja de aristas, calcula los dos cuadrados, súmalos y halla la raíz cuadrada. Puedes comprobarlo en el simulador con a = 44, b = 117 y c = 240."],guide:[["44² =",1936],["117² =",13689],["44² + 117² =",15625],["√15625 =",125],["240² =",57600],["44² + 240² =",59536],["√59536 =",244],["117² + 240² =",71289],["√71289 =",267]],end:"Ya tienes las tres diagonales: pásalas a sus casillas.",diag:v=>[[v.x1,125],[v.x2,244],[v.x3,267]].map(([x,y],i)=>"Diagonal "+(i+1)+": "+(Number(x)===y?"✔":"✘")).join(" · "),check:v=>Number(v.x1)===125&&Number(v.x2)===244&&Number(v.x3)===267,sim:{a:44,b:117,c:240},success:"¡Las tres diagonales son enteras! Esta caja es un cuboide de Euler.",explain:"44² + 117² = 125²; 44² + 240² = 244²; 117² + 240² = 267².",points:2},
+{title:"Reto 3 · El misterio de la diagonal espacial",story:"🕳️ Queda el último sello: un hilo invisible cruza la caja de esquina a esquina. Si su longitud fuera entera, la caja sería perfecta. Acorrálalo entre dos cuadrados.",sub:"¿Será perfecta también la diagonal más larga?",html:`<p>Calcula el cuadrado de la diagonal espacial del cuboide <b>44 × 117 × 240</b>.</p><div class="math">D² = 44² + 117² + 240² = 73 225</div><p>¿Entre qué dos cuadrados consecutivos está 73 225? Introduce los dos números enteros que acotan su raíz.</p><div class="row"><label>Entero inferior<input id="lo" type="number" placeholder="√73225 está por encima de…"></label><label>Entero superior<input id="hi" type="number" placeholder="…y por debajo de…"></label></div>`,hint:"270² = 72 900 y 271² = 73 441.",hints:["La diagonal espacial cumple D² = a² + b² + c². Si D fuera entera, D² tendría que ser un cuadrado perfecto.","Prueba con enteros cercanos a 270: calcula sus cuadrados y compáralos con 73 225."],guide:[["270² =",72900],["271² =",73441],["73 225 − 72 900 =",325],["73 441 − 73 225 =",216]],end:"Como 73 225 queda entre 72 900 y 73 441, la raíz está entre dos enteros consecutivos: escríbelos en las casillas.",diag:v=>{const lo=Number(v.lo),hi=Number(v.hi);if(lo>hi)return"Has puesto los números al revés: primero el menor.";if(hi-lo!==1)return"Deben ser dos enteros consecutivos que encierren √73 225.";return"Calcula n² para valores cercanos a 270 y compáralos con 73 225."},check:v=>Number(v.lo)===270&&Number(v.hi)===271,sim:{a:44,b:117,c:240},success:"¡Misterio resuelto! La diagonal espacial no es entera: está entre 270 y 271.",explain:"270² = 72 900 < 73 225 < 73 441 = 271². Por tanto, √73 225 no es un entero.",points:2},
+{title:"Reto 4 · Diseña tu propia caja",story:"🧪 En el laboratorio la duda crece: ¿habrá otra caja que lo consiga? Construye la tuya, vigila el contador de enteros y calcula su diagonal.",sub:"Explora el cuboide con el simulador",html:`<p>Manipula las dimensiones del simulador y observa cómo cambian las diagonales. Elige una combinación y escribe la <b>diagonal espacial aproximada</b> (redondeada a una décima).</p><p>Mueve a, b y c para elegir tu caja y usa los valores que muestra el simulador.</p><div class="row"><label>Diagonal espacial aproximada<input id="diag" type="number" step="0.1" placeholder="Redondea a 1 decimal"></label></div><p class="math">D = √(a² + b² + c²)</p>`,hint:"Lee los valores a, b y c del simulador. Calcula D con la fórmula y redondea a una décima.",hints:["D es la hipotenusa de un triángulo rectángulo cuyos catetos son la diagonal de la base y la altura c, así que D² = a² + b² + c².","Lee a, b y c en el simulador, calcula sus cuadrados, súmalos y haz la raíz cuadrada. Redondea a una décima."],guide:()=>{const a=+$("a").value,b=+$("b").value,c=+$("c").value,t=a*a+b*b+c*c;return[["a² = "+f(a)+"² =",a*a],["b² = "+f(b)+"² =",b*b],["c² = "+f(c)+"² =",c*c],["a² + b² + c² =",t],["D = √"+f(t)+" ≈",Math.sqrt(t)]]},end:"Escribe D, redondeada a una décima, en la casilla de respuesta.",diag:v=>{const a=+$("a").value,b=+$("b").value,c=+$("c").value,x=Number(v.diag);if(Math.abs(x-(a*a+b*b+c*c))<0.5)return"Has dado D², el resultado antes de la raíz cuadrada.";if(x<Math.max(a,b,c))return"D no puede ser menor que la arista más larga.";return null},check:v=>Math.abs(Number(v.diag)-Math.sqrt(Number(document.getElementById('a').value)**2 + Number(document.getElementById('b').value)**2 + Number(document.getElementById('c').value)**2))<0.11,success:"¡Buen trabajo! Has usado correctamente la fórmula de la diagonal espacial para tu caja.",explain:"La diagonal espacial se obtiene sumando los cuadrados de las tres dimensiones y calculando la raíz cuadrada.",points:2},
+{title:"Reto 5 · El enigma abierto",story:"📜 Hora de redactar el informe para el comité de matemáticos. ¿Qué puedes afirmar con honestidad científica?",sub:"¿Qué podemos afirmar matemáticamente?",html:`<p>Un <b>cuboide perfecto</b> tendría las tres aristas, las tres diagonales de las caras y la diagonal espacial enteras. ¿Cuál es la situación actual del problema?</p><div class="row"><label>Elige una respuesta<select id="choice"><option value="">Selecciona…</option><option value="a">Ya se ha encontrado uno y está demostrado.</option><option value="b">Se sabe que es imposible y existe una demostración.</option><option value="c">No se conoce ninguno; tampoco se ha demostrado que sea imposible.</option></select></label></div>`,hint:"Distingue entre no haber encontrado una solución y haber demostrado que no puede existir.",hints:["Distingue entre «no hemos encontrado una solución» y «hemos demostrado que no existe».","Hazte dos preguntas: ¿conocemos algún cuboide perfecto?, ¿existe una demostración de que no puede existir?"],guide:[["¿Se conoce algún cuboide perfecto? (1 = sí, 0 = no)",0],["¿Existe una demostración de que es imposible? (1 = sí, 0 = no)",0]],end:"Si ambas respuestas son «no», el problema sigue abierto: elige esa opción.",check:v=>v.choice==="c",success:"¡Respuesta de investigador! El problema sigue abierto: no se conoce ningún cuboide perfecto ni una demostración de imposibilidad.",explain:"La ausencia de un ejemplo conocido no equivale a una demostración de que no existe. ¡Es un problema abierto!",points:2}
+];
+let current=0,completed=Array(5).fill(false),attempts=Array(5).fill(0),score=0,streak=0,hl=Array(5).fill(0);const HN=["Orientación","Estrategia","Resolución guiada"];
+const $=id=>document.getElementById(id);
+{const t=new Date();$("date").value=t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0")+"-"+String(t.getDate()).padStart(2,"0")}
+function renderList(){ $("steps").innerHTML=missions.map((m,i)=>`<i class="step ${i===current?"on":""} ${completed[i]?"ok":""}"></i>`).join("");$("missionList").innerHTML=missions.map((m,i)=>`<div class="mission ${i===current?'active':''} ${completed[i]?'done':''}"><span class="badge">${completed[i]?'✓':i+1}</span><span>${m.title.replace(/^Reto \d+ · /,'')}</span></div>`).join('');}
+function render(){let m=missions[current];$("challengeTitle").textContent=m.title;$("challengeSub").textContent=m.sub;$("story").textContent=m.story;$("challengeContent").innerHTML=m.html;$("feedback").className="feedback";$("feedback").textContent="";showHints();$("checkBtn").disabled=completed[current];$("nextBtn").disabled=!completed[current];$("nextBtn").textContent=current===4?"Ver informe final →":"Siguiente reto →";renderList();updateStats();}
+function updateStats(){$("score").textContent=score+" / 10";$("progressText").textContent=completed.filter(Boolean).length+" de 5 retos";$("bar").style.width=(completed.filter(Boolean).length*20)+"%";$("streak").textContent=streak+" 🔥";}
+function getVals(){let obj={};["answer","x1","x2","x3","lo","hi","diag","choice"].forEach(k=>{let el=$(k);if(el)obj[k]=el.value});return obj}
+$("checkBtn").onclick=()=>{let m=missions[current],v=getVals();attempts[current]++;if(m.check(v)){if(!completed[current]){completed[current]=true;score+=attempts[current]===1&&hl[current]<2?m.points:Math.max(1,m.points-1);streak++}let f=$("feedback");f.className="feedback show good";f.innerHTML="<b>✔ "+m.success+"</b><br>"+m.explain+(m.sim?"<br><small>🎛️ Simulador ajustado: a = "+m.sim.a+", b = "+m.sim.b+", c = "+m.sim.c+"."+"</small>":"");$("checkBtn").disabled=true;$("nextBtn").disabled=false;if(m.sim)setSim(m.sim);updateStats();renderList()}else{streak=0;let f=$("feedback"),d=m.diag?m.diag(v):null,nx=hl[current]<3?hl[current]+1:0;f.className="feedback show bad";f.textContent="Aún no es correcto. "+(d?d+" ":"Revisa tus cálculos y vuelve a intentarlo. ")+(attempts[current]>=2&&nx?"👉 Te recomiendo la pista "+nx+" ("+HN[nx-1]+").":"");if(attempts[current]>=2&&nx)$("hintBtn").classList.add("pulse");updateStats()}};
+$("hintBtn").onclick=()=>{hl[current]=Math.min(3,hl[current]+1);showHints()};
+function showHints(){const L=hl[current],m=missions[current],b=$("hintBtn"),box=$("hint");b.classList.remove("pulse");b.disabled=L>=3;b.textContent=L>=3?"💡 Ayuda completa":"💡 Pista "+(L+1)+"/3";
+ if(!L){box.style.display="none";box.innerHTML="";return}
+ box.innerHTML=Array.from({length:L},(_,i)=>`<div class="hl"><b>Pista ${i+1} · ${HN[i]}</b><br>${i<2?m.hints[i]:guideHTML(m)}</div>`).join("");box.style.display="block"}
+function guideHTML(m){const g=typeof m.guide==="function"?m.guide():m.guide;return"<small>Completa cada operación; se corrige mientras escribes.</small>"+g.map(([t,a])=>`<div class="gstep"><span>${t}</span><input type="number" step="any" data-ans="${a}" oninput="chkStep(this)" placeholder="?"><em></em></div>`).join("")+(m.end?`<div class="gend">${m.end}</div>`:"")}
+function chkStep(el){const a=+el.dataset.ans,v=parseFloat(el.value),ok=el.value!==""&&(Number.isInteger(a)?v===a:Math.abs(v-a)<=0.06+0.002*Math.abs(a));el.nextElementSibling.textContent=el.value===""?"":ok?"✔":"✘";el.className=ok?"ok":""}
+$("nextBtn").onclick=()=>{if(current<4){current++;render()}else showFinal()};
+function showFinal(){ $("challenge").style.display="none";$("visualPanel").style.display="none";$("final").classList.add("show");let name=$("student").value||"Equipo investigador";let course=$("course").value||"—";let grade=score;let date=$("date").value||"—";$("report").innerHTML=`<p><b>Investigador/a:</b> ${esc(name)} &nbsp; <b>Curso:</b> ${esc(course)} &nbsp; <b>Fecha:</b> ${esc(date)}</p><p class="result">Calificación: ${grade.toFixed(1)} / 10</p><p>Retos superados: ${completed.filter(Boolean).length} de 5.</p><ul>${missions.map((m,i)=>`<li>${m.title}: ${completed[i]?"Superado":"Pendiente"} · ${attempts[i]} intento(s)${hl[i]?" · ayuda hasta el nivel "+hl[i]:""}</li>`).join("")}</ul><h3>Conclusión matemática</h3><p>El cuboide 44 × 117 × 240 tiene diagonales de cara enteras (125, 244 y 267), pero su diagonal espacial es √73 225, situada entre 270 y 271. Es un cuboide de Euler, no un cuboide perfecto. El problema de encontrar un cuboide perfecto sigue abierto.</p><p><i>Cierre del expediente: la caja de Euler guardó su secreto y el archivo vuelve a sellarse. Quizá la próxima persona en abrirlo seas tú.</i></p>`;window.scrollTo({top:$("final").offsetTop,behavior:"smooth"})}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+render();
+// Simulador: proyección oblicua correcta (se ven frente, derecha y arriba), una diagonal por cara visible
+const svg=$("cuboidSvg"),A=$("a"),B=$("b"),C=$("c");
+let prev=null,yaw=-0.55,pit=0.45,zm=1;const ptrs=new Map();let pd=0,z0=1;
+const isInt=x=>Math.abs(x-Math.round(x))<1e-9;
+const f=n=>isInt(n)?String(Math.round(n)):n.toFixed(2).replace(".",",");
+function draw(){
+ const a=+A.value,b=+B.value;
+ 
+ const c=+C.value;
+ $("av").textContent=f(a);$("bv").textContent=f(b);$("cv").textContent=f(c);
+ $("dimensions").textContent=`a = ${f(a)} · b = ${f(b)} · c = ${f(c)}`;
+ const dab=Math.hypot(a,b),dac=Math.hypot(a,c),dbc=Math.hypot(b,c),D=Math.sqrt(a*a+b*b+c*c);
+ const mx=Math.max(a,b,c),X=190*zm*a/mx,Y=190*zm*b/mx,Z=190*zm*c/mx,cx=450,cy=165;
+ const sw=Math.sin(yaw),cw=Math.cos(yaw),sp=Math.sin(pit),cp=Math.cos(pit);
+ const V=[[0,0,0],[X,0,0],[X,Y,0],[0,Y,0],[0,0,Z],[X,0,Z],[X,Y,Z],[0,Y,Z]].map(([x,y,z])=>{x-=X/2;y-=Y/2;z-=Z/2;const x1=x*cw-y*sw,y1=x*sw+y*cw;return{u:cx+x1,v:cy-(y1*sp+z*cp),d:y1*cp-z*sp}});
+ const q=V.map(o=>[o.u,o.v]);
+ const F=[{i:[0,1,2,3],n:[0,0,-1],k:0},{i:[4,5,6,7],n:[0,0,1],k:0},{i:[0,1,5,4],n:[0,-1,0],k:1},{i:[3,2,6,7],n:[0,1,0],k:1},{i:[0,3,7,4],n:[-1,0,0],k:2},{i:[1,2,6,5],n:[1,0,0],k:2}];
+ F.forEach(fc=>{const[nx,ny,nz]=fc.n;fc.vis=((nx*sw+ny*cw)*cp-nz*sp)<0;fc.dp=fc.i.reduce((t,k)=>t+V[k].d,0)/4});
+ const pol=(ids,fl)=>`<polygon points="${ids.map(i=>q[i].map(n=>n.toFixed(1)).join(",")).join(" ")}" fill="${fl}" stroke="none"/>`;
+ const ln=(i,j,col,w,dash="")=>`<line x1="${q[i][0].toFixed(1)}" y1="${q[i][1].toFixed(1)}" x2="${q[j][0].toFixed(1)}" y2="${q[j][1].toFixed(1)}" stroke="${col}" stroke-width="${w}" stroke-linecap="round" ${dash?`stroke-dasharray="${dash}"`:""}/>`;
+ const txt=(t,x,y,col,s=19)=>`<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" font-family="Arial,sans-serif" font-size="${s}" font-weight="bold" fill="${col}" stroke="#071722" stroke-width="4" paint-order="stroke">${t}</text>`;
+ const mid=(i,j)=>[(q[i][0]+q[j][0])/2,(q[i][1]+q[j][1])/2];
+ const cols=["185,164,255","100,227,238","100,150,238"];
+ const faces=[...F].sort((x,y)=>y.dp-x.dp).map(fc=>pol(fc.i,`rgba(${cols[fc.k]},${fc.vis?.2:.06})`)).join("");
+ const E=[[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]];
+ const visE=(i,j)=>F.some(fc=>fc.vis&&fc.i.includes(i)&&fc.i.includes(j));
+ const hidden=E.filter(([i,j])=>!visE(i,j)).map(([i,j])=>ln(i,j,"#3b6479",2,"4 5")).join("");
+ const edges=E.filter(([i,j])=>visE(i,j)).map(([i,j])=>ln(i,j,"#64e3ee",3.2)).join("");
+ const bot=F[0].vis,ab=bot?[0,2]:[4,6],ac=F[3].vis?[3,6]:[0,5],bc=F[4].vis?[0,7]:[1,6];
+ const tris=pol(bot?[0,1,2]:[4,5,6],"rgba(255,211,107,.3)")+pol(bot?[0,2,6]:[0,4,6],"rgba(255,130,144,.2)");
+ const dg=[[...ab,"#ffd36b","d₁",dab],[...ac,"#69e5a4","d₂",dac],[...bc,"#b9a4ff","d₃",dbc]];
+ const diags=dg.map(([i,j,col])=>ln(i,j,col,3.5,"8 6")).join("");
+ const dl=dg.map(([i,j,col,n,v])=>{const [x,y]=mid(i,j);return txt(`${n}=${f(v)}`,x-24,y-6,col,16)}).join("");
+ const space=ln(0,6,"#ff8290",4,"3 5").replace("<line","<line class=\"flow\"");
+ const vv=new Set();F.forEach(fc=>fc.vis&&fc.i.forEach(k=>vv.add(k)));
+ const dots=[...vv].map(k=>`<circle cx="${q[k][0].toFixed(1)}" cy="${q[k][1].toFixed(1)}" r="4.5" fill="#fff"/>`).join("");
+ const lab=(t,list)=>{const e=list.find(([i,j])=>visE(i,j))||list[0],[x,y]=mid(...e),dx=x-cx,dy=y-cy,l=Math.hypot(dx,dy)||1;return txt(t,x+dx/l*18-6,y+dy/l*18+6,"#fff")};
+ svg.innerHTML=`<rect width="900" height="360" fill="#071722"/><defs><filter id="gl" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>${faces}${hidden}${tris}${edges}<g filter="url(#gl)">${diags}${space}</g>${dots}${dl}${txt("D="+f(D),cx+8,cy+24,"#ff8290",16)}${lab("a",[[0,1],[3,2],[4,5],[7,6]])}${lab("b",[[1,2],[0,3],[5,6],[4,7]])}${lab("c",[[0,4],[1,5],[2,6],[3,7]])}<text x="16" y="26" fill="#aac4d5" font-family="Arial" font-size="15">↻ Arrastra para girar · pellizca para ampliar</text><text x="16" y="350" fill="#c3d9e6" font-family="Arial" font-size="13">Triángulo dorado: a² + b² = d₁² · Triángulo rojo: d₁² + c² = D² · d₂ cara a×c · d₃ cara b×c</text>`;
+ 
+let delta=["","",""];const cur=[dab,dac,dbc];
+ if(prev)cur.forEach((v,i)=>{const d=v-prev[i];if(Math.abs(d)>1e-9)delta[i]=` <span class="${d>0?"up":"down"}">${d>0?"▲ +":"▼ "}${f(d)}</span>`});
+ prev=cur;
+ const items=[["a",a],["b",b],["c",c],["d₁",dab],["d₂",dac],["d₃",dbc],["D",D]],n=items.filter(([,v])=>isInt(v)).length;
+ const card=(nm,col,la,lb,x,y,v,dl)=>`<div class="fcard" style="border-color:${col}"><div class="fh" style="color:${col}">${nm} · cara ${la} × ${lb}</div><div>${nm} = √(${la}² + ${lb}²)</div><div>= √(${f(x)}² + ${f(y)}²) = √${f(x*x+y*y)}</div><div class="fr" style="color:${col}">${nm} = ${f(v)}${dl}</div><small class="note">${isInt(v)?"✔ entera":"no es entera"}</small></div>`;
+ $("live").innerHTML=`<div class="fgrid">${card("d₁","#ffd36b","a","b",a,b,dab,delta[0])}${card("d₂","#69e5a4","a","c",a,c,dac,delta[1])}${card("d₃","#b9a4ff","b","c",b,c,dbc,delta[2])}</div>`
+  +`<div>D = √(a² + b² + c²) = √${f(a*a+b*b+c*c)} = <b>${f(D)}</b></div><div class="chips">${items.map(([k,v])=>`<span class="chip ${isInt(v)?"int":""}">${k} = ${f(v)}${isInt(v)?" ✔":""}</span>`).join("")}</div><small class="note">Números enteros: ${n} de 7. Un cuboide perfecto exigiría que los 7 fueran enteros.</small>`;
+}
+svg.style.touchAction="none";svg.style.cursor="grab";
+const clampZ=z=>Math.max(0.5,Math.min(4,z));
+const dist=()=>{const [p1,p2]=[...ptrs.values()];return Math.hypot(p1.x-p2.x,p1.y-p2.y)||1};
+svg.addEventListener("pointerdown",e=>{ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});if(svg.setPointerCapture)try{svg.setPointerCapture(e.pointerId)}catch(_){}svg.style.cursor="grabbing";if(ptrs.size===2){pd=dist();z0=zm}});
+svg.addEventListener("pointermove",e=>{const o=ptrs.get(e.pointerId);if(!o)return;
+ if(ptrs.size>=2){ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});zm=clampZ(z0*dist()/pd)}
+ else{yaw+=(e.clientX-o.x)*0.01;pit=Math.max(-1.45,Math.min(1.45,pit+(e.clientY-o.y)*0.01));ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY})}
+ draw()});
+["pointerup","pointercancel","pointerleave"].forEach(ev=>svg.addEventListener(ev,e=>{ptrs.delete(e.pointerId);if(!ptrs.size)svg.style.cursor="grab"}));
+svg.addEventListener("wheel",e=>{e.preventDefault();zm=clampZ(zm*(e.deltaY<0?1.12:1/1.12));draw()},{passive:false});
+$("zoomIn").onclick=()=>{zm=clampZ(zm*1.25);draw()};$("zoomOut").onclick=()=>{zm=clampZ(zm/1.25);draw()};
+document.querySelectorAll(".sb").forEach(bt=>{const go=()=>{const el=$(bt.dataset.t);if(el.disabled)return;el.value=Math.max(+el.min,Math.min(+el.max,Math.round(+el.value)+(+bt.dataset.d)));draw()};let t1,t2;const stop=()=>{clearTimeout(t1);clearInterval(t2)};
+ bt.addEventListener("pointerdown",e=>{e.preventDefault();go();t1=setTimeout(()=>{t2=setInterval(go,70)},400)});
+ ["pointerup","pointerleave","pointercancel"].forEach(ev=>bt.addEventListener(ev,stop));
+ bt.addEventListener("click",e=>{if(e.detail===0)go()})});
+$("resetView").onclick=()=>{yaw=-0.55;pit=0.45;zm=1;draw()};
+
+function setSim({a,b,c}){A.value=a;B.value=b;C.value=c;prev=null;draw()}
+[A,B,C].forEach(el=>el.addEventListener("input",draw));window.addEventListener("resize",draw);draw();
+</script>
+</body>
+</html>

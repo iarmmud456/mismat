@@ -1,0 +1,929 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Calculadora de Sistemas Matriciales - El Cuaderno de Pitágoras</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Manrope:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: cuaderno en dos columnas — datos a la izquierda, resultado fijo a la derecha, desarrollo debajo a todo el ancho */
+:root{
+  --bg:#f4f6fa; --surface:#ffffff; --ink:#15203a; --muted:#5b6783; --line:#d9dfea;
+  --accent:#2357b8; --accent-soft:#e4ecfa; --x:#c2410c; --y:#0f766e; --ok:#15803d; --bad:#b91c1c;
+  --ok-soft:#e6f4ea; --bad-soft:#fbe9e9; --on-accent:#ffffff;
+  --f-display:"Space Grotesk",system-ui,sans-serif;
+  --f-body:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1420; --surface:#161f31; --ink:#e5eaf4; --muted:#9aa6bf; --line:#2a3550;
+  --accent:#79a6ff; --accent-soft:#1d2b48; --x:#fb923c; --y:#2dd4bf; --ok:#4ade80; --bad:#f87171;
+  --ok-soft:#14321f; --bad-soft:#3a1a1d; --on-accent:#0e1420; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1420; --surface:#161f31; --ink:#e5eaf4; --muted:#9aa6bf; --line:#2a3550;
+  --accent:#79a6ff; --accent-soft:#1d2b48; --x:#fb923c; --y:#2dd4bf; --ok:#4ade80; --bad:#f87171;
+  --ok-soft:#14321f; --bad-soft:#3a1a1d; --on-accent:#0e1420; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 56px}
+.wrap{max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+header h1{font-family:var(--f-display);font-weight:700;font-size:clamp(1.6rem,4vw,2.3rem);line-height:1.15;margin:0;text-wrap:balance}
+header p{margin:6px 0 0;color:var(--muted);max-width:68ch}
+.vX{color:var(--x);font-style:italic;font-family:var(--f-display)}
+.vY{color:var(--y);font-style:italic;font-family:var(--f-display)}
+.mI{font-style:italic;font-family:var(--f-display);font-weight:500}
+nav.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+nav.tabs button{font:600 .95rem var(--f-body);background:none;border:0;color:var(--muted);padding:10px 14px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+nav.tabs button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.view{display:flex;flex-direction:column;gap:20px}
+.cols{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:880px){.cols{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:18px;min-width:0}
+.sticky{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px)}
+@media (max-width:880px){.sticky{position:static}}
+.panel h2{font-family:var(--f-display);font-size:1.15rem;margin:0}
+.panel h3{font-family:var(--f-display);font-size:1rem;margin:0}
+.stage{display:flex;flex-direction:column;gap:10px}
+.stage+.stage{border-top:1px solid var(--line);padding-top:16px}
+.sl{display:flex;align-items:center;gap:10px;font-weight:700;font-size:.95rem}
+.sl i{font-style:normal;width:1.6rem;height:1.6rem;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);font:700 .8rem var(--f-mono)}
+.sl small{font-weight:400;color:var(--muted);font-size:.85rem}
+.hint{color:var(--muted);font-size:.85rem;margin:0;max-width:62ch}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:600 .86rem var(--f-body);border:1px solid var(--line);border-radius:99px;padding:5px 12px;background:var(--surface);color:var(--ink);cursor:pointer}
+.chip:hover{border-color:var(--accent)}
+.chip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.picker-wrap{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.picker{display:grid;grid-template-columns:repeat(3,30px);gap:4px}
+.picker button{width:30px;height:30px;border:1px solid var(--line);border-radius:6px;background:var(--bg);cursor:pointer;padding:0}
+.picker button.hov{background:var(--accent-soft);border-color:var(--accent)}
+.picker button.on{background:var(--accent);border-color:var(--accent)}
+.size{font:600 1.4rem var(--f-mono)}
+.size small{display:block;font:400 .8rem var(--f-body);color:var(--muted)}
+select,input{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:6px 8px}
+input.cell,input.coef{font-family:var(--f-mono);text-align:center;width:3.5rem;padding:7px 4px}
+input.coef{width:3.3rem}
+input.ok{border-color:var(--ok);background:var(--ok-soft)}
+input.bad{border-color:var(--bad);background:var(--bad-soft)}
+.eqin{display:flex;align-items:center;flex-wrap:wrap;gap:8px;font-size:1.1rem}
+.eqin .tag{font-family:var(--f-mono);font-size:.8rem;color:var(--muted);width:2rem}
+.mats{display:flex;flex-wrap:wrap;gap:18px 26px}
+.matin{display:flex;align-items:center;gap:10px}
+.matin .name{font-size:1.15rem;white-space:nowrap}
+.gridin{display:grid;gap:6px;padding:6px 12px;position:relative}
+.gridin::before,.gridin::after,.mat::before,.mat::after{content:"";position:absolute;top:0;bottom:0;width:7px;border:1.6px solid currentColor}
+.gridin::before,.mat::before{left:0;border-right:0;border-radius:9px 0 0 9px}
+.gridin::after,.mat::after{right:0;border-left:0;border-radius:0 9px 9px 0}
+.mat{display:inline-flex;position:relative;padding:5px 12px;margin:2px 3px;vertical-align:middle}
+.mat .g{display:grid;gap:5px 16px;justify-items:center;align-items:center;font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.mat.cx{color:var(--x)} .mat.cy{color:var(--y)}
+.num{font-family:var(--f-mono);display:inline-flex;align-items:center;white-space:nowrap}
+.fr{display:inline-flex;flex-direction:column;text-align:center;font-size:.82em;line-height:1.12;vertical-align:middle;margin:0 1px}
+.fr>span:first-child{border-bottom:1px solid currentColor;padding:0 2px}
+.op{padding:0 4px;color:var(--muted);font-weight:600}
+.ck{color:var(--ok);font-weight:700;padding-left:4px}
+.line{display:flex;align-items:center;flex-wrap:wrap;gap:4px 2px;min-width:0}
+.scroll{overflow-x:auto;padding-bottom:4px}
+.tag2{font-family:var(--f-mono);font-size:.78rem;color:var(--muted);min-width:4.6rem}
+.btns{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+button.b{font:600 .92rem var(--f-body);border-radius:8px;padding:8px 14px;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--ink);display:inline-flex;align-items:center;gap:8px}
+button.b.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+button.b:hover:not(:disabled){border-color:var(--accent)}
+button.b:disabled{opacity:.5;cursor:not-allowed}
+button.b svg{width:16px;height:16px;flex:none}
+.status{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.badge{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid currentColor}
+.badge.u{color:var(--ok)} .badge.n{color:var(--bad)} .badge.i{color:var(--accent)} .badge.w{color:var(--muted)}
+.result{display:flex;flex-direction:column;gap:12px;font-size:1.12rem;padding:14px 16px;border-radius:10px;background:var(--accent-soft)}
+.preview{display:flex;flex-direction:column;gap:4px;padding:10px 12px;border:1px dashed var(--line);border-radius:10px}
+.lbl{font-size:.74rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:0}
+.problem{color:var(--bad);font-weight:600;margin:0;padding:12px 14px;background:var(--bad-soft);border-radius:10px}
+.opt{display:flex;align-items:center;gap:8px;font-size:.9rem;color:var(--ink);cursor:pointer}
+.opt input{width:16px;height:16px;accent-color:var(--accent)}
+.note{color:var(--muted);font-size:.84rem;margin:0}
+.stephead{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+ol.steps{list-style:none;counter-reset:s;margin:0;padding:0;display:flex;flex-direction:column;gap:18px}
+ol.steps>li{counter-increment:s;display:grid;grid-template-columns:2rem minmax(0,1fr);gap:4px 10px}
+ol.steps>li::before{content:counter(s);grid-row:span 2;width:1.7rem;height:1.7rem;border-radius:50%;background:var(--accent-soft);color:var(--accent);font:700 .85rem var(--f-mono);display:grid;place-items:center}
+ol.steps h4{margin:2px 0 0;font-size:.95rem}
+ol.steps .body{min-width:0;display:flex;flex-direction:column;gap:8px}
+ol.steps .body p{margin:0;color:var(--muted);max-width:68ch}
+@media (prefers-reduced-motion:no-preference){ol.steps>li{animation:in .25s ease both}@keyframes in{from{opacity:.4;transform:translateY(4px)}to{opacity:1;transform:none}}}
+.formula{font-size:1rem;display:flex;flex-direction:column;gap:6px;padding:10px 12px;border:1px dashed var(--line);border-radius:10px}
+.guide{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
+.guide section{min-width:0}
+.guide ul,.guide ol{padding-left:1.2rem;margin:.4rem 0}
+.msg{font-weight:600;margin:0}
+.msg.ok{color:var(--ok)} .msg.bad{color:var(--bad)} .msg.info{color:var(--muted);font-weight:400}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:8px;font-weight:600;font-size:.9rem;z-index:20;max-width:calc(100% - 32px)}
+.ctrl{display:flex;flex-wrap:wrap;gap:16px 28px}
+.ctrl>div{display:flex;flex-direction:column;gap:6px}
+@media (max-width:480px){.panel{padding:16px}input.cell{width:3.1rem}}
+</style>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="hero-text">
+      <h1><span class="h1-main">Calculadora de Sistemas Matriciales</span><span class="sr-only"> - </span><span class="h1-brand"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M4 20V5l16 15z"/><path d="M4 15h5v5"/></svg>El Cuaderno de Pitágoras</span></h1>
+      <p>Sistemas de la forma a<span class="vX">X</span> + b<span class="vY">Y</span> = <span class="mI">A</span>, c<span class="vX">X</span> + d<span class="vY">Y</span> = <span class="mI">B</span> con matrices de hasta 3×3. El resultado se actualiza mientras escribes, con fracciones exactas, y se puede descargar en PDF.</p>
+    </div>
+    <svg class="hero-art" viewBox="0 0 360 232" role="img" aria-label="Hoja de cuaderno cuadriculado con un sistema de dos ecuaciones matriciales con las incógnitas X e Y y una matriz de 3 por 3">
+  <defs><pattern id="sq" width="16" height="16" patternUnits="userSpaceOnUse"><path d="M16 0H0V16" fill="none" stroke="#cfd9ec" stroke-width="1"/></pattern></defs>
+  <rect x="14" y="12" width="332" height="208" rx="12" fill="#ffffff"/>
+  <rect x="14" y="12" width="332" height="208" rx="12" fill="url(#sq)"/>
+  <rect x="14" y="12" width="332" height="208" rx="12" fill="none" stroke="#9db4dc" stroke-width="1.5"/>
+  <path d="M52 12V220" stroke="#e8a0a0" stroke-width="1.5"/>
+  <path d="M74 38c-9 0-9 4-9 12v14c0 8-3 10-9 10 6 0 9 2 9 10v14c0 8 0 12 9 12" fill="none" stroke="#15203a" stroke-width="2.4" stroke-linecap="round"/>
+  <g font-family="Georgia,'Times New Roman',serif" font-style="italic" font-size="25" fill="#15203a">
+    <text x="88" y="70">a<tspan fill="#c2410c" font-weight="700">X</tspan> + b<tspan fill="#0f766e" font-weight="700">Y</tspan> = A</text>
+    <text x="88" y="110">c<tspan fill="#c2410c" font-weight="700">X</tspan> + d<tspan fill="#0f766e" font-weight="700">Y</tspan> = B</text>
+  </g>
+  <path d="M76 132H330" stroke="#2357b8" stroke-width="1.6" stroke-dasharray="5 5"/>
+  <g font-family="Georgia,'Times New Roman',serif" font-style="italic" font-size="19" fill="#15203a">
+    <text x="76" y="166"><tspan fill="#c2410c" font-weight="700">X</tspan> = <tspan font-style="normal">1/Δ</tspan> (dA − bB)</text>
+    <text x="76" y="198"><tspan fill="#0f766e" font-weight="700">Y</tspan> = <tspan font-style="normal">1/Δ</tspan> (aB − cA)</text>
+  </g>
+  <g transform="translate(262 40)">
+    <path d="M10 0H2V62H10M62 0H70V62H62" fill="none" stroke="#2357b8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" transform="translate(0 0)"/>
+    <g fill="#2357b8">
+      <rect x="14" y="8" width="9" height="9" rx="2"/><rect x="31" y="8" width="9" height="9" rx="2" fill="#c2410c"/><rect x="48" y="8" width="9" height="9" rx="2"/>
+      <rect x="14" y="26" width="9" height="9" rx="2" fill="#0f766e"/><rect x="31" y="26" width="9" height="9" rx="2"/><rect x="48" y="26" width="9" height="9" rx="2" fill="#c2410c"/>
+      <rect x="14" y="44" width="9" height="9" rx="2"/><rect x="31" y="44" width="9" height="9" rx="2" fill="#0f766e"/><rect x="48" y="44" width="9" height="9" rx="2"/>
+    </g>
+  </g>
+</svg>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-tab="res">Resolver</button>
+    <button role="tab" aria-selected="false" data-tab="pra">Practicar y hojas PDF</button>
+    <button role="tab" aria-selected="false" data-tab="gui">Guía del método</button>
+  </nav>
+
+  <!-- ============ RESOLVER ============ -->
+  <div id="v-res" class="view">
+    <div class="cols">
+      <div class="panel">
+        <div class="stage">
+          <p class="lbl">Probar un ejemplo <span id="exSize" style="text-transform:none;letter-spacing:0;font-weight:400">con matrices 2 × 2</span></p>
+          <div class="chips" id="exChips">
+            <button class="chip" data-ex="int">Solución entera</button>
+            <button class="chip" data-ex="frac">Con fracciones</button>
+            <button class="chip" data-ex="none">Sin solución</button>
+            <button class="chip" data-ex="inf">Infinitas soluciones</button>
+            <button class="chip" id="clear">Empezar en blanco</button>
+          </div>
+          <p class="hint">Los ejemplos usan el orden que elijas en el paso 1. Cada clic genera uno nuevo.</p>
+        </div>
+        <div class="stage">
+          <div class="sl"><i>1</i>Orden de las matrices <small>pulsa una casilla</small></div>
+          <div class="picker-wrap">
+            <div class="picker" id="pick" role="group" aria-label="Orden de las matrices"></div>
+            <div class="size" id="sizeLbl">2 × 2<small>2 filas, 2 columnas</small></div>
+          </div>
+        </div>
+        <div class="stage">
+          <div class="sl"><i>2</i>Coeficientes <small>números que acompañan a X e Y</small></div>
+          <div class="eqin"><span class="tag">(1)</span><input class="coef" id="ca" aria-label="Coeficiente de X en la ecuación 1"><b class="vX">X</b><span class="op">+</span><input class="coef" id="cb" aria-label="Coeficiente de Y en la ecuación 1"><b class="vY">Y</b><span class="op">=</span><span class="mI">A</span></div>
+          <div class="eqin"><span class="tag">(2)</span><input class="coef" id="cc" aria-label="Coeficiente de X en la ecuación 2"><b class="vX">X</b><span class="op">+</span><input class="coef" id="cd" aria-label="Coeficiente de Y en la ecuación 2"><b class="vY">Y</b><span class="op">=</span><span class="mI">B</span></div>
+          <p class="hint">Para restar, escribe el coeficiente en negativo: X − 3Y se escribe 1 y −3. Si una incógnita no aparece, pon 0.</p>
+        </div>
+        <div class="stage">
+          <div class="sl"><i>3</i>Matrices de los segundos miembros</div>
+          <div class="mats scroll">
+            <div class="matin"><span class="name mI">A =</span><div class="gridin" id="gA"></div></div>
+            <div class="matin"><span class="name mI">B =</span><div class="gridin" id="gB"></div></div>
+          </div>
+          <p class="hint">Vale 5, −2, 0.5 o 3/4. Las casillas vacías cuentan como 0. Con Intro pasas a la casilla siguiente.</p>
+        </div>
+      </div>
+
+      <div class="panel sticky" id="resPanel">
+        <div class="status"><h2 id="resTitle">Resultado</h2><span class="badge w" id="resBadge">—</span></div>
+        <div class="preview"><p class="lbl">Tu sistema</p><div class="scroll" id="preview"></div></div>
+        <div id="resBody"></div>
+        <div class="stage" id="exportBox">
+          <label class="opt"><input type="checkbox" id="optSteps" checked> Incluir el desarrollo paso a paso en el PDF</label>
+          <div class="btns">
+            <button class="b primary" id="pdf1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-5-5m5 5l5-5M5 21h14"/></svg>Descargar PDF</button>
+            <button class="b" id="latex1">Copiar en LaTeX</button>
+          </div>
+          <p class="note" id="dlNote1" hidden></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" id="stepsPanel">
+      <div class="stephead">
+        <h2>Desarrollo paso a paso</h2>
+        <div class="chips" id="modeChips">
+          <button class="chip" data-mode="all" aria-pressed="true">Ver todo</button>
+          <button class="chip" data-mode="class" aria-pressed="false">Modo clase: de uno en uno</button>
+        </div>
+      </div>
+      <ol class="steps" id="steps"></ol>
+      <div class="btns" id="classBtns" hidden>
+        <button class="b primary" id="nextStep">Siguiente paso</button>
+        <button class="b" id="restart">Volver al principio</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PRACTICAR ============ -->
+  <div id="v-pra" class="view" hidden>
+    <div class="cols">
+      <div class="panel">
+        <h2>Ejercicio para practicar</h2>
+        <div class="ctrl">
+          <div><p class="lbl">Orden</p><div class="chips" data-chips="psize"><button class="chip" data-v="2,2" aria-pressed="true">2×2</button><button class="chip" data-v="2,3">2×3</button><button class="chip" data-v="3,2">3×2</button><button class="chip" data-v="3,3">3×3</button></div></div>
+          <div><p class="lbl">Nivel</p><div class="chips" data-chips="plevel"><button class="chip" data-v="1">Básico</button><button class="chip" data-v="2" aria-pressed="true">Medio</button><button class="chip" data-v="3">Con fracciones</button></div></div>
+        </div>
+        <div class="preview"><p class="lbl">Resuelve el sistema</p><div class="scroll" id="psys"></div></div>
+        <div class="stage">
+          <p class="lbl">Tu respuesta</p>
+          <div class="mats scroll">
+            <div class="matin"><span class="name vX">X =</span><div class="gridin" id="gPX"></div></div>
+            <div class="matin"><span class="name vY">Y =</span><div class="gridin" id="gPY"></div></div>
+          </div>
+        </div>
+        <div class="btns">
+          <button class="b primary" id="pcheck">Comprobar</button>
+          <button class="b" id="phint">Pista</button>
+          <button class="b" id="pshow">Ver solución</button>
+          <button class="b" id="pnew">Otro ejercicio</button>
+        </div>
+        <p class="msg" id="pmsg" hidden></p>
+        <div class="btns"><button class="b" id="popen">Abrir en Resolver</button><button class="b" id="latex2">Copiar enunciado en LaTeX</button></div>
+      </div>
+
+      <div class="panel">
+        <h2>Hoja de ejercicios en PDF</h2>
+        <p class="hint">Genera una hoja nueva cada vez, con enunciados y, si quieres, soluciones al final. Sirve para repasar en casa o para preparar un control.</p>
+        <div class="ctrl">
+          <div><p class="lbl">Ejercicios</p><div class="chips" data-chips="wn"><button class="chip" data-v="4">4</button><button class="chip" data-v="6" aria-pressed="true">6</button><button class="chip" data-v="8">8</button><button class="chip" data-v="10">10</button></div></div>
+          <div><p class="lbl">Orden</p><div class="chips" data-chips="wsize"><button class="chip" data-v="2,2">2×2</button><button class="chip" data-v="2,3">2×3</button><button class="chip" data-v="3,3">3×3</button><button class="chip" data-v="mix" aria-pressed="true">Variado</button></div></div>
+          <div><p class="lbl">Nivel</p><div class="chips" data-chips="wlevel"><button class="chip" data-v="1">Básico</button><button class="chip" data-v="2" aria-pressed="true">Medio</button><button class="chip" data-v="3">Con fracciones</button></div></div>
+        </div>
+        <div class="stage">
+          <label class="opt"><input type="checkbox" id="wSpace" checked> Dejar espacio para resolver</label>
+          <label class="opt"><input type="checkbox" id="wSol" checked> Añadir las soluciones al final</label>
+          <label class="opt"><input type="checkbox" id="wSteps"> Soluciones con el desarrollo completo</label>
+          <label class="opt"><input type="checkbox" id="wTitleOn" checked> Título personalizado <input id="wTitle" value="Sistemas de ecuaciones matriciales" style="flex:1;min-width:0" aria-label="Título de la hoja"></label>
+        </div>
+        <div class="btns"><button class="b primary" id="pdf2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-5-5m5 5l5-5M5 21h14"/></svg>Descargar hoja (PDF)</button></div>
+        <p class="note" id="dlNote2" hidden></p>
+      </div>
+    </div>
+    <div class="panel" id="out2" hidden></div>
+  </div>
+
+  <!-- ============ GUÍA ============ -->
+  <div id="v-gui" class="view" hidden>
+    <div class="panel">
+      <div class="guide">
+        <section>
+          <h3>Qué es un sistema matricial</h3>
+          <p>Dos ecuaciones cuyas incógnitas son matrices. <span class="vX">X</span> e <span class="vY">Y</span> tienen el mismo orden que <span class="mI">A</span> y <span class="mI">B</span>; los coeficientes a, b, c, d son números.</p>
+          <p>Se resuelve igual que un sistema lineal de dos incógnitas, con una restricción: las matrices no se dividen. Dividir entre 5 significa multiplicar por el número 1/5.</p>
+        </section>
+        <section>
+          <h3>Método de reducción</h3>
+          <ol>
+            <li>Calcula Δ = ad − bc. Si Δ ≠ 0 hay una única solución.</li>
+            <li>Multiplica (1) por d y (2) por b y resta: Δ·<span class="vX">X</span> = d<span class="mI">A</span> − b<span class="mI">B</span>.</li>
+            <li>Multiplica la matriz obtenida por 1/Δ.</li>
+            <li>Repite para <span class="vY">Y</span>, o sustituye <span class="vX">X</span> en una ecuación y despeja.</li>
+            <li>Comprueba sustituyendo en las dos ecuaciones.</li>
+          </ol>
+        </section>
+        <section>
+          <h3>Fórmula directa</h3>
+          <div class="formula">
+            <div><b class="vX">X</b> = (1/Δ)·(d<span class="mI">A</span> − b<span class="mI">B</span>)</div>
+            <div><b class="vY">Y</b> = (1/Δ)·(a<span class="mI">B</span> − c<span class="mI">A</span>)</div>
+          </div>
+          <p class="note">Útil para comprobar. En el examen conviene escribir la reducción completa.</p>
+        </section>
+        <section>
+          <h3>Cuando Δ = 0</h3>
+          <p>Los primeros miembros son proporcionales: (2) es λ veces (1).</p>
+          <ul>
+            <li>Si <span class="mI">B</span> = λ<span class="mI">A</span>, las dos ecuaciones dicen lo mismo: infinitas soluciones, con una incógnita libre.</li>
+            <li>Si <span class="mI">B</span> ≠ λ<span class="mI">A</span>, hay contradicción: el sistema no tiene solución.</li>
+          </ul>
+        </section>
+        <section>
+          <h3>Errores frecuentes</h3>
+          <ul>
+            <li>Restar solo algunos elementos de la matriz al eliminar.</li>
+            <li>Olvidar el signo al multiplicar por un coeficiente negativo.</li>
+            <li>Escribir <span class="mI">A</span>/<span class="mI">B</span>: entre matrices no existe la división.</li>
+            <li>Dar <span class="vX">X</span> con distinto orden que <span class="mI">A</span>.</li>
+          </ul>
+        </section>
+        <section>
+          <h3>Ideas para clase</h3>
+          <ul>
+            <li>Proyecta un ejemplo y usa el modo clase para ir mostrando los pasos de uno en uno.</li>
+            <li>Descarga el PDF de una resolución para colgarlo en el aula virtual.</li>
+            <li>Genera hojas de ejercicios distintas para cada grupo, con o sin soluciones.</li>
+          </ul>
+        </section>
+      </div>
+    </div>
+  </div>
+  <footer class="foot">
+    <span>Calculadora de Sistemas Matriciales · <b>El Cuaderno de Pitágoras</b></span>
+    <a href="https://mismat.wordpress.com/" target="_blank" rel="noopener">mismat.wordpress.com</a>
+  </footer>
+</div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<style>
+/* ===== Mejoras de interfaz ===== */
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.hero{background-color:#143272;background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);background-size:24px 24px;color:#fff;border-radius:18px;padding:clamp(20px,4vw,36px);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,340px);gap:24px 32px;align-items:center;border:1px solid rgba(255,255,255,.12)}
+.hero-text{min-width:0}
+.hero .brand{display:flex;align-items:center;gap:8px;margin:0 0 12px;font:700 .92rem var(--f-display);letter-spacing:.02em;color:#c9d8fb;max-width:none}
+.hero h1{font-size:clamp(1.7rem,4.4vw,2.6rem);line-height:1.1;color:#fff}
+.hero .h1-main{display:block}
+.hero .h1-brand{display:flex;align-items:center;gap:8px;margin-top:10px;font:500 clamp(1rem,2.2vw,1.2rem)/1.3 var(--f-body);color:#c9d8fb}
+.hero p{color:#d8e3fb}
+.hero .vX{color:#fdba74}.hero .vY{color:#5eead4}.hero .mI{color:#c9d8fb}
+.hero p{margin-top:14px;max-width:60ch}
+.hero-art{width:100%;height:auto;justify-self:center;max-width:340px;filter:drop-shadow(0 14px 26px rgba(0,0,0,.4));transform:rotate(-1.5deg)}
+@media (max-width:760px){.hero{grid-template-columns:minmax(0,1fr)}.hero-art{max-width:280px;justify-self:start}}
+nav.tabs{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px;width:fit-content;max-width:100%}
+nav.tabs button{border:0;border-radius:9px;margin:0;padding:9px 16px;transition:background-color .15s,color .15s}
+nav.tabs button:hover{color:var(--accent);background:var(--accent-soft)}
+nav.tabs button[aria-selected="true"]{background:var(--accent);color:var(--on-accent)}
+.panel{border-radius:14px;box-shadow:0 1px 2px rgba(21,32,58,.06),0 10px 28px -16px rgba(21,32,58,.22)}
+#resPanel{border-top:3px solid var(--accent)}
+.result{border:1px solid var(--line)}
+.chip,button.b{transition:border-color .15s,background-color .15s,filter .15s}
+button.b.primary:hover:not(:disabled){filter:brightness(1.08)}
+input:hover,select:hover{border-color:var(--muted)}
+input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.foot{display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:space-between;align-items:center;color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padding-top:16px;margin-top:8px}
+.foot a{color:var(--accent);font-weight:600;text-decoration:none}
+.foot a:hover{text-decoration:underline}
+@media (max-width:480px){nav.tabs{width:100%}nav.tabs button{flex:1 1 0;padding:9px 6px;font-size:.82rem;white-space:nowrap}}
+</style>
+
+<script>
+/* ================= Fracciones exactas ================= */
+function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b){const t=a%b;a=b;b=t}return a}
+class Fr{
+  constructor(n,d=1){if(d===0)throw new Error('div0');if(d<0){n=-n;d=-d}const g=gcd(n,d)||1;this.n=n/g||0;this.d=d/g}
+  add(o){return new Fr(this.n*o.d+o.n*this.d,this.d*o.d)}
+  sub(o){return new Fr(this.n*o.d-o.n*this.d,this.d*o.d)}
+  mul(o){return new Fr(this.n*o.n,this.d*o.d)}
+  inv(){return new Fr(this.d,this.n)}
+  neg(){return new Fr(-this.n,this.d)}
+  abs(){return new Fr(Math.abs(this.n),this.d)}
+  z(){return this.n===0}
+  eq(o){return this.n===o.n&&this.d===o.d}
+  one(){return this.n===1&&this.d===1}
+}
+const F=n=>new Fr(n);
+const fstr=f=>(f.n<0?'−':'')+Math.abs(f.n)+(f.d===1?'':'/'+f.d);
+function parseFr(s,coef=false){
+  s=String(s).trim().replace(/[−–]/g,'-').replace(',','.').replace(/\s+/g,'');
+  if(s==='')return null;
+  if(coef&&s==='-')return F(-1);
+  if(coef&&s==='+')return F(1);
+  let m=s.match(/^([+-]?\d+)\/([+-]?\d+)$/);
+  if(m){const d=+m[2];if(d===0)return undefined;return new Fr(+m[1],d)}
+  m=s.match(/^([+-]?)(\d*)\.(\d{1,6})$/);
+  if(m){const den=10**m[3].length;return new Fr((m[1]==='-'?-1:1)*((+(m[2]||0))*den+ +m[3]),den)}
+  if(/^[+-]?\d{1,9}$/.test(s))return F(+s);
+  return undefined;
+}
+/* ================= Matrices ================= */
+const scal=(k,M)=>M.map(r=>r.map(x=>k.mul(x)));
+const addM=(M,N)=>M.map((r,i)=>r.map((x,j)=>x.add(N[i][j])));
+const subM=(M,N)=>M.map((r,i)=>r.map((x,j)=>x.sub(N[i][j])));
+const eqM=(M,N)=>M.every((r,i)=>r.every((x,j)=>x.eq(N[i][j])));
+const zeroM=M=>M.every(r=>r.every(x=>x.z()));
+
+/* ================= Tokens matemáticos (comunes a pantalla y PDF) ================= */
+const T=s=>({k:'t',s}),O=s=>({k:'o',s}),V=v=>({k:'v',v}),N=f=>({k:'n',f}),MX=(M,c)=>({k:'m',M,c}),ML=s=>({k:'ml',s}),TG=s=>({k:'g',s}),CK={k:'ck'};
+const flat=xs=>xs.flatMap(x=>typeof x==='string'?[T(x)]:Array.isArray(x)?flat(x):[x]);
+const P=(...xs)=>({kind:'p',toks:flat(xs)});
+const Mq=(...xs)=>({kind:'m',toks:flat(xs)});
+const sym=v=>v==='X'||v==='Y'?V(v):ML(v);
+function lin(terms){
+  const out=[];
+  for(const [k,v] of terms){
+    if(k.z())continue;
+    const neg=k.n<0,a=k.abs();
+    if(out.length)out.push(O(neg?'−':'+'));else if(neg)out.push(O('−'));
+    if(!a.one())out.push(N(a));
+    out.push(sym(v));
+  }
+  return out.length?out:[N(F(0))];
+}
+const pf=k=>k.n<0?[T('('),N(k),T(')')]:[N(k)];
+const kv=(k,v)=>k.one()?[sym(v)]:[...pf(k),T('·'),sym(v)];
+const km=(k,M,c)=>k.one()?[MX(M,c)]:[N(k),T('·'),MX(M)];
+const tagk=(k,e)=>`${k.n<0?'('+fstr(k)+')':fstr(k)}·(${e})`;
+const sysItems=(a,b,c,d,A,B)=>[Mq(TG('(1)'),lin([[a,'X'],[b,'Y']]),O('='),MX(A)),Mq(TG('(2)'),lin([[c,'X'],[d,'Y']]),O('='),MX(B))];
+
+/* ================= Resolución ================= */
+function solve(a,b,c,d,A,B){
+  const S=[];const D=a.mul(d).sub(b.mul(c));
+  S.push({t:'Planteamos el sistema',items:sysItems(a,b,c,d,A,B)});
+  S.push({t:'Determinante de los coeficientes',items:[
+    Mq('Δ = ',pf(a),'·',pf(d),O('−'),pf(b),'·',pf(c),O('='),N(D)),
+    P(D.z()?'Δ = 0: los primeros miembros son proporcionales y no hay solución única.':'Δ ≠ 0: el sistema tiene una única solución.')]});
+  if(!D.z()){
+    let X,Y;
+    if(b.z()){X=scal(a.inv(),A);S.push({t:'Despejamos X',items:[P('La ecuación (1) no contiene ',V('Y'),', así que despejamos ',V('X'),' directamente.'),Mq(V('X'),O('='),km(a.inv(),A),a.one()?[]:[O('='),MX(X,'x')])]});}
+    else if(d.z()){X=scal(c.inv(),B);S.push({t:'Despejamos X',items:[P('La ecuación (2) no contiene ',V('Y'),', así que despejamos ',V('X'),' directamente.'),Mq(V('X'),O('='),km(c.inv(),B),c.one()?[]:[O('='),MX(X,'x')])]});}
+    else{
+      const dA=scal(d,A),bB=scal(b,B),R=subM(dA,bB);X=scal(D.inv(),R);
+      S.push({t:'Eliminamos Y para obtener X',items:[
+        P('Multiplicamos (1) por ',pf(d),' y (2) por ',pf(b),'. Al restar, desaparece ',V('Y'),'.'),
+        Mq(TG(tagk(d,1)),lin([[d.mul(a),'X'],[d.mul(b),'Y']]),O('='),kv(d,'A')),
+        Mq(TG(tagk(b,2)),lin([[b.mul(c),'X'],[b.mul(d),'Y']]),O('='),kv(b,'B')),
+        Mq(TG('Restamos'),lin([[D,'X']]),O('='),kv(d,'A'),O('−'),kv(b,'B')),
+        Mq(TG(''),O('='),MX(dA),O('−'),MX(bB),O('='),MX(R)),
+        Mq(V('X'),O('='),D.one()?[]:[km(D.inv(),R),O('=')],MX(X,'x'))]});
+    }
+    if(a.z()){Y=scal(b.inv(),A);S.push({t:'Despejamos Y',items:[P('La ecuación (1) no contiene ',V('X'),', así que despejamos ',V('Y'),' directamente.'),Mq(V('Y'),O('='),km(b.inv(),A),b.one()?[]:[O('='),MX(Y,'y')])]});}
+    else if(c.z()){Y=scal(d.inv(),B);S.push({t:'Despejamos Y',items:[P('La ecuación (2) no contiene ',V('X'),', así que despejamos ',V('Y'),' directamente.'),Mq(V('Y'),O('='),km(d.inv(),B),d.one()?[]:[O('='),MX(Y,'y')])]});}
+    else{
+      const aB=scal(a,B),cA=scal(c,A),R=subM(aB,cA);Y=scal(D.inv(),R);
+      S.push({t:'Eliminamos X para obtener Y',items:[
+        P('Multiplicamos (1) por ',pf(c),' y (2) por ',pf(a),'. Restamos (2) − (1) y desaparece ',V('X'),'.'),
+        Mq(TG(tagk(c,1)),lin([[c.mul(a),'X'],[c.mul(b),'Y']]),O('='),kv(c,'A')),
+        Mq(TG(tagk(a,2)),lin([[a.mul(c),'X'],[a.mul(d),'Y']]),O('='),kv(a,'B')),
+        Mq(TG('Restamos'),lin([[D,'Y']]),O('='),kv(a,'B'),O('−'),kv(c,'A')),
+        Mq(TG(''),O('='),MX(aB),O('−'),MX(cA),O('='),MX(R)),
+        Mq(V('Y'),O('='),D.one()?[]:[km(D.inv(),R),O('=')],MX(Y,'y'))]});
+    }
+    const L1=addM(scal(a,X),scal(b,Y)),L2=addM(scal(c,X),scal(d,Y));
+    S.push({t:'Comprobación',items:[
+      P('Sustituimos ',V('X'),' e ',V('Y'),' en las dos ecuaciones:'),
+      Mq(TG('(1)'),lin([[a,'X'],[b,'Y']]),O('='),MX(L1),eqM(L1,A)?[O('='),ML('A'),CK]:[O('≠'),ML('A')]),
+      Mq(TG('(2)'),lin([[c,'X'],[d,'Y']]),O('='),MX(L2),eqM(L2,B)?[O('='),ML('B'),CK]:[O('≠'),ML('B')])]});
+    return {type:'u',X,Y,D,S,k:[a,b,c,d]};
+  }
+  const allZero=[a,b,c,d].every(k=>k.z());
+  const comp=allZero?(zeroM(A)&&zeroM(B)):(eqM(scal(c,A),scal(a,B))&&eqM(scal(d,A),scal(b,B)));
+  const r1=!(a.z()&&b.z()),r2=!(c.z()&&d.z());
+  if(!comp){
+    let items;
+    if(r1&&r2){
+      const lam=a.z()?d.mul(b.inv()):c.mul(a.inv());
+      items=[P('El primer miembro de (2) es ',N(lam),' veces el de (1). Para que hubiera solución haría falta ',ML('B'),' = ',N(lam),'·',ML('A'),', y no es así:'),
+        Mq(N(lam),T('·'),ML('A'),O('='),MX(scal(lam,A)),O('≠'),MX(B),O('='),ML('B'))];
+    }else{
+      items=[P(`La ecuación ${r1?'(2)':'(1)'} queda así, lo cual es imposible:`),Mq(N(F(0)),O('='),MX(r1?B:A))];
+    }
+    items.push(P('Conclusión: el sistema es incompatible y no tiene solución.'));
+    S.push({t:'Comparamos los segundos miembros',items});
+    return {type:'n',S,D,k:[a,b,c,d]};
+  }
+  if(allZero){
+    S.push({t:'Conclusión',items:[P('Las dos ecuaciones quedan 0 = 0: cualquier par de matrices ',V('X'),', ',V('Y'),' del orden indicado es solución.')]});
+    return {type:'i',S,D,k:[a,b,c,d],desc:'Cualquier par de matrices X, Y es solución.'};
+  }
+  const [p,q,M,tag]=r1?[a,b,A,'(1)']:[c,d,B,'(2)'];
+  const items=[P(`Las dos ecuaciones son equivalentes (una es múltiplo de la otra), así que basta con ${tag}. Hay infinitas soluciones.`)];
+  let desc;
+  if(!q.z()){
+    const Mqq=scal(q.inv(),M),k=p.mul(q.inv()).neg();
+    items.push(Mq(V('Y'),O('='),km(q.inv(),M),p.z()?[]:[O('−'),kv(p.mul(q.inv()),'X')]));
+    if(!q.one())items.push(Mq(V('Y'),O('='),MX(Mqq),k.z()?[]:[O(k.n<0?'−':'+'),k.abs().one()?[V('X')]:[N(k.abs()),T('·'),V('X')]]));
+    items.push(P(p.z()?['Así ',V('Y'),' queda determinada y ',V('X'),' puede ser cualquier matriz del mismo orden.']:['Para cada matriz ',V('X'),' que elijas se obtiene una ',V('Y'),'.']));
+    desc=p.z()?'Y queda fija y X puede ser cualquier matriz.':'Cada X que elijas da una Y distinta.';
+  }else{
+    const X=scal(p.inv(),M);
+    items.push(Mq(V('X'),O('='),km(p.inv(),M),p.one()?[]:[O('='),MX(X,'x')]),P(V('Y'),' puede ser cualquier matriz del mismo orden.'));
+    desc='X queda fija y Y puede ser cualquier matriz.';
+  }
+  S.push({t:'Conclusión',items});
+  return {type:'i',S,D,k:[a,b,c,d],desc};
+}
+const formulaItems=res=>{const [a,b,c,d]=res.k;return [
+  Mq(V('X'),O('='),N(res.D.inv()),T('·('),kv(d,'A'),O('−'),kv(b,'B'),T(')')),
+  Mq(V('Y'),O('='),N(res.D.inv()),T('·('),kv(a,'B'),O('−'),kv(c,'A'),T(')'))]};
+
+/* ================= Render en pantalla ================= */
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function fh(f){
+  if(f.d===1)return `<span class="num">${f.n<0?'−'+(-f.n):f.n}</span>`;
+  return `<span class="num">${f.n<0?'−':''}<span class="fr"><span>${Math.abs(f.n)}</span><span>${f.d}</span></span></span>`;
+}
+function mh(M,c){return `<span class="mat ${c==='x'?'cx':c==='y'?'cy':''}"><span class="g" style="grid-template-columns:repeat(${M[0].length},auto)">${M.flat().map(x=>`<span>${fh(x)}</span>`).join('')}</span></span>`}
+function th(t){
+  switch(t.k){
+    case 't':return `<span>${esc(t.s)}</span>`;
+    case 'o':return `<span class="op">${esc(t.s)}</span>`;
+    case 'v':return `<b class="v${t.v}">${t.v}</b>`;
+    case 'ml':return `<span class="mI">${esc(t.s)}</span>`;
+    case 'g':return `<span class="tag2">${esc(t.s)}</span>`;
+    case 'n':return fh(t.f);
+    case 'm':return mh(t.M,t.c);
+    case 'ck':return `<span class="ck" aria-label="se cumple">✓</span>`;
+  }
+}
+const itemH=it=>it.kind==='p'?`<p>${it.toks.map(th).join('')}</p>`:`<div class="scroll"><div class="line">${it.toks.map(th).join(' ')}</div></div>`;
+const itemsH=items=>items.map(itemH).join('');
+const stepsH=S=>S.map(s=>`<li><h4>${esc(s.t)}</h4><div class="body">${itemsH(s.items)}</div></li>`).join('');
+function summaryH(res){
+  if(res.type==='u')return `<div class="result">${itemH(Mq(V('X'),O('='),MX(res.X,'x')))}${itemH(Mq(V('Y'),O('='),MX(res.Y,'y')))}</div><div class="formula"><p class="lbl">Fórmula directa</p>${itemsH(formulaItems(res))}</div>`;
+  if(res.type==='n')return `<div class="result"><p style="margin:0">Los primeros miembros son proporcionales pero los segundos no. El sistema no tiene solución.</p></div>`;
+  return `<div class="result"><p style="margin:0">Las dos ecuaciones son equivalentes. ${esc(res.desc)}</p></div>`;
+}
+const TYPES={u:['Solución única','u','Compatible determinado'],n:['Sin solución','n','Incompatible'],i:['Infinitas soluciones','i','Compatible indeterminado']};
+
+/* ================= PDF vectorial (pdf-lib) ================= */
+let pdfLibP=null;
+function loadPdfLib(){
+  if(window.PDFLib)return Promise.resolve(window.PDFLib);
+  if(!pdfLibP)pdfLibP=new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js';s.onload=()=>res(window.PDFLib);s.onerror=()=>{pdfLibP=null;rej(new Error('load'))};document.head.appendChild(s)});
+  return pdfLibP;
+}
+const SYMCH=new Set(['−','∆','≠','λ']);
+class PW{
+  constructor(doc,f,rgb,title){
+    Object.assign(this,{doc,f,title});this.W=595.28;this.H=841.89;this.mx=56;this.mt=60;this.mb=60;this.cw=this.W-2*this.mx;this.pages=[];
+    this.C={ink:rgb(.08,.12,.23),muted:rgb(.36,.4,.51),x:rgb(.76,.25,.05),y:rgb(.06,.46,.43),acc:rgb(.14,.34,.72),ok:rgb(.08,.5,.24),line:rgb(.8,.84,.9),soft:rgb(.93,.95,.99)};
+    this.newPage();
+  }
+  newPage(){this.page=this.doc.addPage([this.W,this.H]);this.pages.push(this.page);this.y=this.H-this.mt}
+  ensure(h){if(this.y-h<this.mb&&this.y<this.H-this.mt-1)this.newPage()}
+  segs(s,font){const out=[];let cur='',cf=null;for(const ch of s){const f=ch==='Δ'?'tri':SYMCH.has(ch)?this.f.sym:font;if(f!==cf&&cur){out.push([cf,cur]);cur=''}cf=f;cur+=ch}if(cur)out.push([cf,cur]);return out}
+  sw(f,t,size){return f==='tri'?t.length*size*0.66:f.widthOfTextAtSize(t,size)}
+  tw(s,font,size){return this.segs(s,font).reduce((a,[f,t])=>a+this.sw(f,t,size),0)}
+  dt(s,x,y,font,size,color){for(const [f,t] of this.segs(s,font)){
+    if(f==='tri'){for(let i=0;i<t.length;i++){const w=size*0.6,h=size*0.7;this.page.drawSvgPath(`M 0 ${h} L ${w/2} 0 L ${w} ${h} Z`,{x:x+size*0.03,y:y+h,borderColor:color,borderWidth:size*0.075});x+=size*0.66}}
+    else{this.page.drawText(t,{x,y,font:f,size,color});x+=f.widthOfTextAtSize(t,size)}}}
+  txt(s,font,size,color,pad=0){const w=this.tw(s,font,size)+2*pad;return {w,h:size*1.35,draw:(x,m)=>this.dt(s,x+pad,m-size*0.34,font,size,color)}}
+  num(fr,s,col){
+    const f=this.f.reg;
+    if(fr.d===1)return this.txt((fr.n<0?'−':'')+Math.abs(fr.n),f,s,col);
+    const fs=s*0.8,sg=fr.n<0?'−':'',sw=sg?this.tw(sg,f,s)+1:0,ns=String(Math.abs(fr.n)),ds=String(fr.d);
+    const nw=this.tw(ns,f,fs),dw=this.tw(ds,f,fs),bw=Math.max(nw,dw)+3;
+    return {w:sw+bw,h:fs*2.55,draw:(x,m)=>{
+      if(sg)this.dt(sg,x,m-s*0.34,f,s,col);
+      const bx=x+sw;this.page.drawLine({start:{x:bx,y:m+s*0.28},end:{x:bx+bw,y:m+s*0.28},thickness:0.6,color:col});
+      const ax=m+s*0.28;this.dt(ns,bx+(bw-nw)/2,ax+2,f,fs,col);this.dt(ds,bx+(bw-dw)/2,ax-1.8-fs*0.72,f,fs,col);
+    }};
+  }
+  mat(M,s,c){
+    const col=c==='x'?this.C.x:c==='y'?this.C.y:this.C.ink;
+    const cells=M.map(r=>r.map(v=>this.num(v,s,col)));
+    const R=M.length,K=M[0].length,gx=11,gy=2,pad=10;
+    const cw=[...Array(K)].map((_,j)=>Math.max(...cells.map(r=>r[j].w)));
+    const rh=cells.map(r=>Math.max(s*1.3,...r.map(q=>q.h)));
+    const iw=cw.reduce((p,q)=>p+q,0)+gx*(K-1),ih=rh.reduce((p,q)=>p+q,0)+gy*(R-1);
+    const w=iw+2*pad,h=ih+6;
+    return {w,h,draw:(x,m)=>{
+      const top=m+h/2;
+      this.page.drawSvgPath(`M 5 0 C 0.5 ${h*0.22} 0.5 ${h*0.78} 5 ${h}`,{x:x+1,y:top,borderColor:col,borderWidth:0.9});
+      this.page.drawSvgPath(`M 0 0 C 4.5 ${h*0.22} 4.5 ${h*0.78} 0 ${h}`,{x:x+w-6,y:top,borderColor:col,borderWidth:0.9});
+      let yy=top-3;
+      for(let i=0;i<R;i++){const cm=yy-rh[i]/2;let xx=x+pad;for(let j=0;j<K;j++){const q=cells[i][j];q.draw(xx+(cw[j]-q.w)/2,cm);xx+=cw[j]+gx}yy-=rh[i]+gy}
+    }};
+  }
+  meas(t,s){
+    const f=this.f,C=this.C;
+    switch(t.k){
+      case 't':return this.txt(t.s,f.reg,s,C.ink);
+      case 'o':return this.txt(t.s,f.reg,s,C.muted,3.5);
+      case 'v':return this.txt(t.v,f.bi,s*1.06,t.v==='X'?C.x:C.y,0.5);
+      case 'ml':return this.txt(t.s,f.it,s*1.06,C.ink,0.5);
+      case 'g':{const fs=s*0.8,o=this.txt(t.s,f.reg,fs,C.muted);return {w:Math.max(o.w+8,58),h:o.h,draw:o.draw}}
+      case 'n':return this.num(t.f,s,C.ink);
+      case 'm':return this.mat(t.M,s,t.c);
+      case 'ck':return {w:14,h:s,draw:(x,m)=>this.page.drawSvgPath('M 0 4 L 3.5 8 L 10 0',{x:x+3,y:m+4,borderColor:C.ok,borderWidth:1.4})};
+    }
+  }
+  layout(it,s,indent){
+    const words=it.kind==='p',gap=words?0:2.5,maxW=this.cw-indent;
+    let toks=it.toks;
+    if(words)toks=toks.flatMap(t=>t.k==='t'?(t.s.match(/\S+\s*|\s+/g)||[]).map(w=>T(w)):[t]);
+    const lines=[];let cur=[],x=0;
+    for(const t of toks){const m=this.meas(t,s);if(cur.length&&x+m.w>maxW){lines.push(cur);cur=[];x=0}cur.push(m);x+=m.w+gap}
+    if(cur.length)lines.push(cur);
+    return lines.map(items=>({items,h:Math.max(...items.map(i=>i.h)),gap}));
+  }
+  itemHeight(it,s=10.5,indent=0){return this.layout(it,s,indent).reduce((p,l)=>p+l.h+(it.kind==='p'?2:5),0)}
+  item(it,s=10.5,indent=0){
+    for(const l of this.layout(it,s,indent)){
+      this.ensure(l.h);const m=this.y-l.h/2;let x=this.mx+indent;
+      for(const i of l.items){i.draw(x,m);x+=i.w+l.gap}
+      this.y-=l.h+(it.kind==='p'?2:5);
+    }
+  }
+  heading(s,size,{font=this.f.bold,color=this.C.ink,before=0,after=4,keep=0}={}){
+    this.y-=before;this.ensure(size*1.3+keep);this.dt(s,this.mx,this.y-size,font,size,color);this.y-=size*1.3+after;
+  }
+  rule(){this.ensure(8);this.page.drawLine({start:{x:this.mx,y:this.y-3},end:{x:this.W-this.mx,y:this.y-3},thickness:0.5,color:this.C.line});this.y-=10}
+  space(h){if(this.y-h<this.mb)this.newPage();else this.y-=h}
+  steps(S,indent=0){
+    S.forEach((st,i)=>{
+      const first=st.items[0]?this.itemHeight(st.items[0],10.5,indent+18):0;
+      this.y-=6;this.ensure(16+first);
+      const cx=this.mx+indent+7,cy=this.y-7;
+      this.page.drawCircle({x:cx,y:cy,size:7.5,color:this.C.soft});
+      const ns=String(i+1);this.dt(ns,cx-this.tw(ns,this.f.bold,8.5)/2,cy-3,this.f.bold,8.5,this.C.acc);
+      this.dt(st.t,this.mx+indent+20,this.y-11,this.f.bold,11,this.C.ink);this.y-=18;
+      st.items.forEach(it=>this.item(it,10.5,indent+20));
+    });
+  }
+  footer(){
+    const n=this.pages.length;
+    this.pages.forEach((p,i)=>{p.drawLine({start:{x:this.mx,y:40},end:{x:this.W-this.mx,y:40},thickness:0.4,color:this.C.line});
+      p.drawText(this.title,{x:this.mx,y:28,size:8,font:this.f.reg,color:this.C.muted});
+      const t=`Página ${i+1} de ${n}`;p.drawText(t,{x:this.W-this.mx-this.f.reg.widthOfTextAtSize(t,8),y:28,size:8,font:this.f.reg,color:this.C.muted})});
+  }
+}
+async function makePDF(title,build){
+  const L=await loadPdfLib();const {PDFDocument,StandardFonts,rgb}=L;
+  const doc=await PDFDocument.create();
+  const f={reg:await doc.embedFont(StandardFonts.Helvetica),bold:await doc.embedFont(StandardFonts.HelveticaBold),it:await doc.embedFont(StandardFonts.HelveticaOblique),bi:await doc.embedFont(StandardFonts.HelveticaBoldOblique),sym:await doc.embedFont(StandardFonts.Symbol)};
+  const w=new PW(doc,f,rgb,title);build(w);w.footer();
+  doc.setTitle(title);doc.setCreator('Sistemas matriciales con X e Y');
+  return await doc.save();
+}
+const today=()=>new Date().toLocaleDateString('es-ES',{day:'numeric',month:'long',year:'numeric'});
+function buildResultPDF(st,withSteps){
+  const {res,A,B}=st;const [a,b,c,d]=res.k;
+  return makePDF('Sistemas matriciales con X e Y',w=>{
+    w.heading('Resolución de un sistema matricial',19,{after:2});
+    w.heading(`Generado el ${today()}`,9,{font:w.f.reg,color:w.C.muted,after:8});w.rule();
+    w.heading('Sistema',12.5,{before:6,after:6,keep:40});
+    sysItems(a,b,c,d,A,B).forEach(it=>w.item(it,11));
+    w.heading('Resultado: '+TYPES[res.type][0].toLowerCase()+' ('+TYPES[res.type][2].toLowerCase()+')',12.5,{before:10,after:6,keep:40});
+    if(res.type==='u'){
+      w.item(Mq(V('X'),O('='),MX(res.X,'x'),T('      '),V('Y'),O('='),MX(res.Y,'y')),11.5);
+      w.heading('Fórmula directa',10,{font:w.f.bold,color:w.C.muted,before:6,after:4,keep:20});
+      formulaItems(res).forEach(it=>w.item(it,10.5));
+    }else{
+      w.item(P(res.type==='n'?'Los primeros miembros son proporcionales pero los segundos no: el sistema no tiene solución.':'Las dos ecuaciones son equivalentes. '+res.desc),10.5);
+    }
+    if(withSteps){w.heading('Desarrollo paso a paso',12.5,{before:14,after:2,keep:40});w.steps(res.S)}
+  });
+}
+function buildSheetPDF(ex,opt){
+  return makePDF(opt.title,w=>{
+    w.heading(opt.title,18,{after:4});
+    w.dt('Nombre: ______________________________________',w.mx,w.y-10,w.f.reg,10,w.C.ink);
+    w.dt('Fecha: ________________',w.W-w.mx-w.tw('Fecha: ________________',w.f.reg,10),w.y-10,w.f.reg,10,w.C.ink);w.y-=22;w.rule();
+    w.item(P('Resuelve los siguientes sistemas, donde ',V('X'),' e ',V('Y'),' son matrices del mismo orden que las del segundo miembro. Indica si el sistema no tiene solución o tiene infinitas, y comprueba los resultados.'),10.5);
+    ex.forEach((e,i)=>{
+      const items=sysItems(...e.k,e.A,e.B),h=items.reduce((p,it)=>p+w.itemHeight(it,11,18),0);
+      const space=opt.space?(e.A.length===3?150:115):10;
+      w.heading(`Ejercicio ${i+1}`,11.5,{before:12,after:4,keep:h+(opt.space?Math.min(space,60):0)});
+      items.forEach(it=>w.item(it,11,18));
+      if(opt.space)w.space(space);
+    });
+    if(opt.sol){
+      w.newPage();w.heading('Soluciones',16,{after:6});w.rule();
+      ex.forEach((e,i)=>{
+        const r=e.res;
+        if(opt.steps){w.heading(`Ejercicio ${i+1}`,12,{before:10,after:2,keep:60});w.steps(r.S.slice(1),10)}
+        else{
+          const it=r.type==='u'?Mq(V('X'),O('='),MX(r.X,'x'),T('    '),V('Y'),O('='),MX(r.Y,'y')):P(r.type==='n'?'Sistema incompatible: no tiene solución.':'Infinitas soluciones. '+r.desc);
+          w.heading(`Ejercicio ${i+1}`,11.5,{before:10,after:3,keep:w.itemHeight(it,11,18)});w.item(it,11,18);
+        }
+      });
+    }
+  });
+}
+
+/* ================= Descargas ================= */
+let dlP=null;
+function getDL(){if(!dlP)dlP=(window.claude&&typeof window.claude.use==='function')?window.claude.use('downloads').catch(()=>null):Promise.resolve(null);return dlP}
+function dlUnavailable(){
+  ['pdf1','pdf2'].forEach(id=>document.getElementById(id).disabled=true);
+  ['dlNote1','dlNote2'].forEach(id=>{const n=document.getElementById(id);n.textContent='La descarga en PDF funciona al abrir esta página en claude.ai o en la app de Claude.';n.hidden=false});
+}
+async function savePDF(btn,filename,make){
+  const label=btn.innerHTML;btn.disabled=true;btn.textContent='Preparando PDF…';
+  try{
+    const dl=await getDL();if(!dl){dlUnavailable();return}
+    let bytes;try{bytes=await make()}catch(e){toast('No se pudo cargar el generador de PDF. Revisa la conexión y vuelve a intentarlo.');return}
+    try{await dl.save({filename,data:new Blob([bytes],{type:'application/pdf'})});toast('PDF descargado')}
+    catch(e){const c=e&&e.code;
+      if(c==='declined')toast('Descarga cancelada');
+      else if(c==='rate_limited')toast('Hay otra descarga pendiente. Espera un momento y vuelve a intentarlo.');
+      else if(c==='host_unavailable')toast('Esta app no puede guardar archivos. Abre la página en un navegador o en el ordenador.');
+      else{toast('No se pudo descargar el PDF en esta vista.');if(c==='unavailable'||c==='not_granted'||c==='capability_disabled')dlUnavailable()}}
+  }finally{btn.innerHTML=label;if(!document.getElementById('dlNote1').textContent)btn.disabled=false}
+}
+
+/* ================= LaTeX y portapapeles ================= */
+const lf=f=>f.d===1?String(f.n):`${f.n<0?'-':''}\\frac{${Math.abs(f.n)}}{${f.d}}`;
+const lm=M=>`\\begin{pmatrix} ${M.map(r=>r.map(lf).join(' & ')).join(' \\\\ ')} \\end{pmatrix}`;
+function llin(terms){let o='',first=true;for(const [k,v] of terms){if(k.z())continue;const a=k.abs();o+=first?(k.n<0?'-':''):(k.n<0?' - ':' + ');o+=(a.one()?'':lf(a))+v;first=false}return o||'0'}
+function latexSys(a,b,c,d,A,B,res){
+  let s=`\\left\\{\\begin{array}{l}\n${llin([[a,'X'],[b,'Y']])} = ${lm(A)} \\\\[6pt]\n${llin([[c,'X'],[d,'Y']])} = ${lm(B)}\n\\end{array}\\right.`;
+  if(res&&res.type==='u')s+=`\n\n% Solución\nX = ${lm(res.X)}, \\qquad Y = ${lm(res.Y)}`;
+  return s;
+}
+function copy(text){
+  try{navigator.clipboard.writeText(text).then(()=>toast('Copiado al portapapeles'),()=>fallbackCopy(text))}catch(e){fallbackCopy(text)}
+}
+function fallbackCopy(text){
+  const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();
+  let ok=false;try{ok=document.execCommand('copy')}catch(e){}
+  ta.remove();toast(ok?'Copiado al portapapeles':'No se pudo copiar en esta vista');
+}
+let tt;function toast(m){const t=document.getElementById('toast');t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,2600)}
+
+/* ================= Entradas ================= */
+let R=2,C=2;
+function buildGrid(el,prefix,r,c,keep=true){
+  const old={};if(keep)el.querySelectorAll('input').forEach(i=>old[i.id]=i.value);
+  el.style.gridTemplateColumns=`repeat(${c},auto)`;el.innerHTML='';
+  for(let i=0;i<r;i++)for(let j=0;j<c;j++){
+    const inp=document.createElement('input');inp.className='cell';inp.id=`${prefix}-${i}-${j}`;inp.placeholder='0';inp.autocomplete='off';
+    inp.setAttribute('aria-label',`${prefix} fila ${i+1} columna ${j+1}`);inp.value=old[inp.id]??'';el.appendChild(inp);
+  }
+}
+function readGrid(prefix,r,c){
+  const M=[];
+  for(let i=0;i<r;i++){const row=[];for(let j=0;j<c;j++){
+    const el=document.getElementById(`${prefix}-${i}-${j}`);const v=parseFr(el.value);
+    if(v===undefined)return {bad:{el,msg:`En ${prefix}, fila ${i+1}, columna ${j+1}, «${el.value}» no es un número. Escribe por ejemplo 4, −2, 0.5 o 3/4.`}};
+    row.push(v??F(0));
+  }M.push(row)}
+  return {M};
+}
+const cellStr=x=>x.d===1?String(x.n):`${x.n}/${x.d}`;
+function fillGrid(prefix,M){M.forEach((r,i)=>r.forEach((x,j)=>{document.getElementById(`${prefix}-${i}-${j}`).value=cellStr(x)}))}
+
+/* selector de orden */
+const pick=document.getElementById('pick');
+for(let i=1;i<=3;i++)for(let j=1;j<=3;j++){const b=document.createElement('button');b.dataset.r=i;b.dataset.c=j;b.setAttribute('aria-label',`${i} × ${j}`);pick.appendChild(b)}
+function paintPick(hr,hc){pick.querySelectorAll('button').forEach(b=>{const r=+b.dataset.r,c=+b.dataset.c;b.classList.toggle('on',r<=R&&c<=C);b.classList.toggle('hov',hr!=null&&r<=hr&&c<=hc&&!(r<=R&&c<=C))})}
+function setSize(r,c,run=true){
+  R=r;C=c;buildGrid(document.getElementById('gA'),'A',r,c);buildGrid(document.getElementById('gB'),'B',r,c);
+  document.getElementById('sizeLbl').innerHTML=`${r} × ${c}<small>${r} fila${r>1?'s':''}, ${c} columna${c>1?'s':''}</small>`;
+  document.getElementById('exSize').textContent=`con matrices ${r} × ${c}`;
+  paintPick();if(run)update();
+}
+pick.addEventListener('mouseover',e=>{const b=e.target.closest('button');if(b)paintPick(+b.dataset.r,+b.dataset.c)});
+pick.addEventListener('mouseleave',()=>paintPick());
+pick.addEventListener('click',e=>{const b=e.target.closest('button');if(b)setSize(+b.dataset.r,+b.dataset.c)});
+
+/* ================= Resolver: actualización en directo ================= */
+const toM=a=>a.map(r=>r.map(x=>F(x)));
+const EX=[
+  {k:[2,1,1,-1],A:[[5,3],[2,2]],B:[[-2,3],[-2,-5]]},
+  {k:[1,1,1,-1],A:[[3,1,2],[0,2,4],[4,2,-1]],B:[[-1,-1,2],[-2,4,-2],[-4,2,-3]]},
+  {k:[3,-2,1,4],A:[[1,0,2],[3,-1,0]],B:[[2,1,0],[0,1,-3]]},
+  {k:[1,2,2,4],A:[[1,0],[0,1]],B:[[2,1],[0,2]]},
+  {k:[1,2,2,4],A:[[1,2],[3,4]],B:[[2,4],[6,8]]}
+];
+const CO=['ca','cb','cc','cd'];
+const CO_NAME=['el coeficiente de X en (1)','el coeficiente de Y en (1)','el coeficiente de X en (2)','el coeficiente de Y en (2)'];
+function setCoefs(k){CO.forEach((id,i)=>document.getElementById(id).value=typeof k[i]==='object'?cellStr(k[i]):k[i])}
+function loadEx(i){
+  const e=EX[i];setSize(e.A.length,e.A[0].length,false);setCoefs(e.k);fillGrid('A',toM(e.A));fillGrid('B',toM(e.B));update();
+}
+/* Ejemplos generados en el orden elegido (R × C) */
+function makeExample(kind){
+  const mk=(lo,hi)=>Array.from({length:R},()=>Array.from({length:C},()=>F(rnd(lo,hi))));
+  if(kind==='int')return genSystem(R,C,2);
+  if(kind==='frac'){let s,t=0;do{s=genSystem(R,C,3);t++}while(t<50&&![...s.res.X.flat(),...s.res.Y.flat()].some(x=>x.d!==1));return s}
+  const p=pickOne([1,2,3,-1]),q=pickOne([1,2,-2,3,-3]),lam=pickOne([2,3,-2]);
+  const K=[F(p),F(q),F(lam*p),F(lam*q)],A=mk(-5,5);let B=scal(F(lam),A);
+  if(kind==='none'){B=B.map(r=>r.slice());const i=rnd(0,R-1),j=rnd(0,C-1);B[i][j]=B[i][j].add(F(pickOne([1,2,-1,3])))}
+  return {k:K,A,B};
+}
+function loadGenerated(kind){
+  const e=makeExample(kind);setCoefs(e.k);fillGrid('A',e.A);fillGrid('B',e.B);
+  document.querySelectorAll('#exChips .chip').forEach(c=>c.setAttribute('aria-pressed',c.dataset.ex===kind));update();
+}
+let cur=null,mode='all',shown=1;
+function readSystem(){
+  document.querySelectorAll('#v-res input.bad').forEach(i=>i.classList.remove('bad'));
+  const ks=[];
+  for(let i=0;i<4;i++){const el=document.getElementById(CO[i]);const v=parseFr(el.value,true);
+    if(v===null)return {problem:`Falta ${CO_NAME[i]}. Si esa incógnita no aparece, escribe 0.`,el,soft:true};
+    if(v===undefined){el.classList.add('bad');return {problem:`${CO_NAME[i][0].toUpperCase()+CO_NAME[i].slice(1)} («${el.value}») no es un número.`,el}}
+    ks.push(v)}
+  const ra=readGrid('A',R,C);if(ra.bad){ra.bad.el.classList.add('bad');return {problem:ra.bad.msg}}
+  const rb=readGrid('B',R,C);if(rb.bad){rb.bad.el.classList.add('bad');return {problem:rb.bad.msg}}
+  return {k:ks,A:ra.M,B:rb.M};
+}
+function update(){
+  const s=readSystem();
+  const title=document.getElementById('resTitle'),badge=document.getElementById('resBadge'),body=document.getElementById('resBody'),pv=document.getElementById('preview');
+  if(s.problem){
+    cur=null;title.textContent='Resultado';badge.className='badge w';badge.textContent=s.soft?'Faltan datos':'Revisa los datos';
+    pv.innerHTML='<p class="note">El sistema aparecerá aquí cuando estén todos los coeficientes.</p>';
+    body.innerHTML=`<p class="problem">${esc(s.problem)}</p>`;
+    document.getElementById('steps').innerHTML='';document.getElementById('classBtns').hidden=true;
+    document.getElementById('exportBox').hidden=true;return;
+  }
+  const [a,b,c,d]=s.k;const res=solve(a,b,c,d,s.A,s.B);cur={...s,res};
+  const t=TYPES[res.type];title.textContent=t[0];badge.className='badge '+t[1];badge.textContent=t[2];
+  pv.innerHTML=itemsH(sysItems(a,b,c,d,s.A,s.B));
+  body.innerHTML=summaryH(res);document.getElementById('exportBox').hidden=false;
+  shown=1;renderSteps();
+}
+function renderSteps(){
+  if(!cur)return;const S=cur.res.S;const ol=document.getElementById('steps');
+  const n=mode==='all'?S.length:Math.min(shown,S.length);
+  ol.innerHTML=stepsH(S.slice(0,n));
+  const cb=document.getElementById('classBtns');cb.hidden=mode==='all';
+  const nb=document.getElementById('nextStep');nb.disabled=n>=S.length;nb.textContent=n>=S.length?'Desarrollo completo':`Siguiente paso (${n+1} de ${S.length})`;
+}
+let deb;
+document.getElementById('v-res').addEventListener('input',e=>{if(e.target.matches('input.cell,input.coef')){document.querySelectorAll('#exChips .chip').forEach(c=>c.setAttribute('aria-pressed','false'));clearTimeout(deb);deb=setTimeout(update,200)}});
+document.addEventListener('focusin',e=>{if(e.target.matches('input.cell,input.coef'))setTimeout(()=>{try{e.target.select()}catch(_){}} ,0)});
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Enter'||!e.target.matches('input.cell,input.coef'))return;
+  e.preventDefault();const scope=e.target.closest('.panel');const all=[...scope.querySelectorAll('input.cell,input.coef')];
+  const nx=all[all.indexOf(e.target)+1];if(nx)nx.focus();
+});
+document.querySelectorAll('#exChips .chip[data-ex]').forEach(b=>b.addEventListener('click',()=>loadGenerated(b.dataset.ex)));
+document.getElementById('clear').addEventListener('click',()=>{document.querySelectorAll('#v-res input.cell,#v-res input.coef').forEach(i=>i.value='');document.querySelectorAll('#exChips .chip').forEach(c=>c.setAttribute('aria-pressed','false'));update();document.getElementById('ca').focus()});
+document.querySelectorAll('#modeChips .chip').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.mode;document.querySelectorAll('#modeChips .chip').forEach(c=>c.setAttribute('aria-pressed',c===b));shown=1;renderSteps()}));
+document.getElementById('nextStep').addEventListener('click',()=>{shown++;renderSteps();const li=document.querySelector('#steps>li:last-child');if(li)li.scrollIntoView({block:'nearest',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'})});
+document.getElementById('restart').addEventListener('click',()=>{shown=1;renderSteps()});
+document.getElementById('latex1').addEventListener('click',()=>{if(!cur)return;const [a,b,c,d]=cur.k;copy(latexSys(a,b,c,d,cur.A,cur.B,cur.res))});
+document.getElementById('pdf1').addEventListener('click',e=>{if(!cur)return;const st=cur;savePDF(e.currentTarget,`sistema-matricial-${R}x${C}.pdf`,()=>buildResultPDF(st,document.getElementById('optSteps').checked))});
+
+/* ================= Chips genéricos ================= */
+const chipVal=name=>document.querySelector(`[data-chips="${name}"] .chip[aria-pressed="true"]`).dataset.v;
+document.querySelectorAll('[data-chips]').forEach(g=>g.addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;g.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed',c===b));g.dispatchEvent(new CustomEvent('chipchange',{bubbles:true}))}));
+
+/* ================= Generador de ejercicios ================= */
+const rnd=(lo,hi)=>lo+Math.floor(Math.random()*(hi-lo+1));
+const pickOne=a=>a[Math.floor(Math.random()*a.length)];
+function genSystem(r,c,lv){
+  const pool=lv===1?[-2,-1,1,2]:[-4,-3,-2,-1,1,2,3,4];
+  let a,b,cc,d,D,tries=0;
+  do{a=pickOne(pool);b=pickOne(pool);cc=pickOne(pool);d=pickOne(pool);D=a*d-b*cc;tries++}
+  while((D===0||(lv<3&&Math.abs(D)>(lv===1?3:12))||(lv===3&&(Math.abs(D)<3||Math.abs(D)>11)))&&tries<800);
+  const K=[F(a),F(b),F(cc),F(d)];let A,B;
+  const mk=(lo,hi)=>Array.from({length:r},()=>Array.from({length:c},()=>F(rnd(lo,hi))));
+  if(lv<3){const Rg=lv===1?3:5;const X=mk(-Rg,Rg),Y=mk(-Rg,Rg);A=addM(scal(K[0],X),scal(K[1],Y));B=addM(scal(K[2],X),scal(K[3],Y))}
+  else{A=mk(-6,6);B=mk(-6,6)}
+  return {k:K,A,B,r,c,res:solve(...K,A,B)};
+}
+let P1=null;
+function newPractice(){
+  const [r,c]=chipVal('psize').split(',').map(Number);P1=genSystem(r,c,+chipVal('plevel'));
+  document.getElementById('psys').innerHTML=itemsH(sysItems(...P1.k,P1.A,P1.B));
+  buildGrid(document.getElementById('gPX'),'PX',r,c,false);buildGrid(document.getElementById('gPY'),'PY',r,c,false);
+  document.getElementById('pmsg').hidden=true;document.getElementById('out2').hidden=true;
+}
+function msg(cls,text){const m=document.getElementById('pmsg');m.className='msg '+cls;m.textContent=text;m.hidden=false}
+function checkP(){
+  let wrong={X:0,Y:0},empty=0;
+  for(const [pre,key] of [['PX','X'],['PY','Y']])for(let i=0;i<P1.r;i++)for(let j=0;j<P1.c;j++){
+    const el=document.getElementById(`${pre}-${i}-${j}`);const v=parseFr(el.value);el.classList.remove('ok','bad');
+    if(v===null){empty++;continue}
+    if(v!==undefined&&v.eq(P1.res[key][i][j]))el.classList.add('ok');else{el.classList.add('bad');wrong[key]++}
+  }
+  if(empty)return msg('bad',`Faltan ${empty} casilla${empty>1?'s':''} por rellenar.`);
+  if(!wrong.X&&!wrong.Y)return msg('ok','¡Correcto! X e Y cumplen las dos ecuaciones.');
+  const parts=[];if(wrong.X)parts.push(`${wrong.X} en X`);if(wrong.Y)parts.push(`${wrong.Y} en Y`);
+  msg('bad',`Hay ${wrong.X+wrong.Y} casilla${wrong.X+wrong.Y>1?'s':''} incorrecta${wrong.X+wrong.Y>1?'s':''} (${parts.join(' y ')}), marcadas en rojo. Las fracciones se escriben como 3/4.`);
+}
+document.querySelector('[data-chips="psize"]').addEventListener('chipchange',newPractice);
+document.querySelector('[data-chips="plevel"]').addEventListener('chipchange',newPractice);
+document.getElementById('pnew').addEventListener('click',newPractice);
+document.getElementById('pcheck').addEventListener('click',checkP);
+document.getElementById('phint').addEventListener('click',()=>{const [a,b,c,d]=P1.k;const D=P1.res.D;
+  msg('info',`Δ = ${fstr(a)}·${fstr(d)} − (${fstr(b)})·(${fstr(c)}) = ${fstr(D)}. Para eliminar Y, multiplica (1) por ${fstr(d)} y (2) por ${fstr(b)} y resta: ${fstr(D)}·X = ${fstr(d)}A − (${fstr(b)})B.`)});
+document.getElementById('pshow').addEventListener('click',()=>{const o=document.getElementById('out2');
+  o.innerHTML=`<div class="status"><h2>Solución</h2><span class="badge u">Compatible determinado</span></div>${summaryH(P1.res)}<h3>Desarrollo paso a paso</h3><ol class="steps">${stepsH(P1.res.S)}</ol>`;o.hidden=false;o.scrollIntoView({block:'start',behavior:'auto'})});
+document.getElementById('popen').addEventListener('click',()=>{setSize(P1.r,P1.c,false);setCoefs(P1.k);fillGrid('A',P1.A);fillGrid('B',P1.B);document.querySelectorAll('#exChips .chip').forEach(c=>c.setAttribute('aria-pressed','false'));update();showTab('res')});
+document.getElementById('latex2').addEventListener('click',()=>copy(latexSys(...P1.k,P1.A,P1.B,null)));
+function sheetExercises(){
+  const n=+chipVal('wn'),sz=chipVal('wsize'),lv=+chipVal('wlevel');const sizes=['2,2','2,3','3,2','3,3'];
+  return Array.from({length:n},(_,i)=>{const s=sz==='mix'?sizes[Math.min(3,Math.floor(i*4/n))]:sz;const [r,c]=s.split(',').map(Number);return genSystem(r,c,lv)});
+}
+function sheetOpts(){const on=document.getElementById('wTitleOn').checked;const t=document.getElementById('wTitle').value.trim();
+  return {title:(on&&t)?t:'Sistemas de ecuaciones matriciales',space:document.getElementById('wSpace').checked,sol:document.getElementById('wSol').checked,steps:document.getElementById('wSteps').checked}}
+document.getElementById('wSteps').addEventListener('change',e=>{if(e.target.checked)document.getElementById('wSol').checked=true});
+document.getElementById('wSol').addEventListener('change',e=>{if(!e.target.checked)document.getElementById('wSteps').checked=false});
+document.getElementById('pdf2').addEventListener('click',e=>{const ex=sheetExercises(),o=sheetOpts();savePDF(e.currentTarget,'hoja-sistemas-matriciales.pdf',()=>buildSheetPDF(ex,o))});
+
+/* ================= Pestañas ================= */
+function showTab(t){
+  document.querySelectorAll('nav.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));
+  ['res','pra','gui'].forEach(id=>document.getElementById('v-'+id).hidden=id!==t);
+  try{localStorage.setItem('sm-tab',t)}catch(e){}
+}
+document.querySelectorAll('nav.tabs button').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
+
+/* ================= Arranque ================= */
+loadEx(0);newPractice();
+let saved=null;try{saved=localStorage.getItem('sm-tab')}catch(e){}
+if(saved==='pra'||saved==='gui')showTab(saved);
+getDL().then(d=>{if(!d)dlUnavailable()});
+setTimeout(()=>loadPdfLib().catch(()=>{}),1500);
+window.__pdf={buildResultPDF,buildSheetPDF,sheetExercises,sheetOpts,get cur(){return cur}};
+</script>
+
+</body></html>

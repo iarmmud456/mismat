@@ -1,0 +1,532 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Calculadora de Sistemas de Ecuaciones - El Cuaderno de Pitágoras</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Manrope:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: cuaderno en dos columnas — datos a la izquierda, resultado fijo a la derecha, desarrollo debajo a todo el ancho */
+:root{
+  --bg:#f4f6fa; --surface:#ffffff; --ink:#15203a; --muted:#5b6783; --line:#d9dfea;
+  --accent:#2357b8; --accent-soft:#e4ecfa; --x:#c2410c; --y:#0f766e; --ok:#15803d; --bad:#b91c1c;
+  --ok-soft:#e6f4ea; --bad-soft:#fbe9e9; --on-accent:#ffffff;
+  --f-display:"Space Grotesk",system-ui,sans-serif;
+  --f-body:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1420; --surface:#161f31; --ink:#e5eaf4; --muted:#9aa6bf; --line:#2a3550;
+  --accent:#79a6ff; --accent-soft:#1d2b48; --x:#fb923c; --y:#2dd4bf; --ok:#4ade80; --bad:#f87171;
+  --ok-soft:#14321f; --bad-soft:#3a1a1d; --on-accent:#0e1420; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1420; --surface:#161f31; --ink:#e5eaf4; --muted:#9aa6bf; --line:#2a3550;
+  --accent:#79a6ff; --accent-soft:#1d2b48; --x:#fb923c; --y:#2dd4bf; --ok:#4ade80; --bad:#f87171;
+  --ok-soft:#14321f; --bad-soft:#3a1a1d; --on-accent:#0e1420; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 56px}
+.wrap{max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+header h1{font-family:var(--f-display);font-weight:700;font-size:clamp(1.6rem,4vw,2.3rem);line-height:1.15;margin:0;text-wrap:balance}
+header p{margin:6px 0 0;color:var(--muted);max-width:68ch}
+.vX{color:var(--x);font-style:italic;font-family:var(--f-display)}
+.vY{color:var(--y);font-style:italic;font-family:var(--f-display)}
+.mI{font-style:italic;font-family:var(--f-display);font-weight:500}
+nav.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+nav.tabs button{font:600 .95rem var(--f-body);background:none;border:0;color:var(--muted);padding:10px 14px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+nav.tabs button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.view{display:flex;flex-direction:column;gap:20px}
+.cols{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:880px){.cols{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:18px;min-width:0}
+.sticky{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px)}
+@media (max-width:880px){.sticky{position:static}}
+.panel h2{font-family:var(--f-display);font-size:1.15rem;margin:0}
+.panel h3{font-family:var(--f-display);font-size:1rem;margin:0}
+.stage{display:flex;flex-direction:column;gap:10px}
+.stage+.stage{border-top:1px solid var(--line);padding-top:16px}
+.sl{display:flex;align-items:center;gap:10px;font-weight:700;font-size:.95rem}
+.sl i{font-style:normal;width:1.6rem;height:1.6rem;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);font:700 .8rem var(--f-mono)}
+.sl small{font-weight:400;color:var(--muted);font-size:.85rem}
+.hint{color:var(--muted);font-size:.85rem;margin:0;max-width:62ch}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:600 .86rem var(--f-body);border:1px solid var(--line);border-radius:99px;padding:5px 12px;background:var(--surface);color:var(--ink);cursor:pointer}
+.chip:hover{border-color:var(--accent)}
+.chip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.picker-wrap{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.picker{display:grid;grid-template-columns:repeat(3,30px);gap:4px}
+.picker button{width:30px;height:30px;border:1px solid var(--line);border-radius:6px;background:var(--bg);cursor:pointer;padding:0}
+.picker button.hov{background:var(--accent-soft);border-color:var(--accent)}
+.picker button.on{background:var(--accent);border-color:var(--accent)}
+.size{font:600 1.4rem var(--f-mono)}
+.size small{display:block;font:400 .8rem var(--f-body);color:var(--muted)}
+select,input{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:6px 8px}
+input.cell,input.coef{font-family:var(--f-mono);text-align:center;width:3.5rem;padding:7px 4px}
+input.coef{width:3.3rem}
+input.ok{border-color:var(--ok);background:var(--ok-soft)}
+input.bad{border-color:var(--bad);background:var(--bad-soft)}
+.eqin{display:flex;align-items:center;flex-wrap:wrap;gap:8px;font-size:1.1rem}
+.eqin .tag{font-family:var(--f-mono);font-size:.8rem;color:var(--muted);width:2rem}
+.mats{display:flex;flex-wrap:wrap;gap:18px 26px}
+.matin{display:flex;align-items:center;gap:10px}
+.matin .name{font-size:1.15rem;white-space:nowrap}
+.gridin{display:grid;gap:6px;padding:6px 12px;position:relative}
+.gridin::before,.gridin::after,.mat::before,.mat::after{content:"";position:absolute;top:0;bottom:0;width:7px;border:1.6px solid currentColor}
+.gridin::before,.mat::before{left:0;border-right:0;border-radius:9px 0 0 9px}
+.gridin::after,.mat::after{right:0;border-left:0;border-radius:0 9px 9px 0}
+.mat{display:inline-flex;position:relative;padding:5px 12px;margin:2px 3px;vertical-align:middle}
+.mat .g{display:grid;gap:5px 16px;justify-items:center;align-items:center;font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.mat.cx{color:var(--x)} .mat.cy{color:var(--y)}
+.num{font-family:var(--f-mono);display:inline-flex;align-items:center;white-space:nowrap}
+.fr{display:inline-flex;flex-direction:column;text-align:center;font-size:.82em;line-height:1.12;vertical-align:middle;margin:0 1px}
+.fr>span:first-child{border-bottom:1px solid currentColor;padding:0 2px}
+.op{padding:0 4px;color:var(--muted);font-weight:600}
+.ck{color:var(--ok);font-weight:700;padding-left:4px}
+.line{display:flex;align-items:center;flex-wrap:wrap;gap:4px 2px;min-width:0}
+.scroll{overflow-x:auto;padding-bottom:4px}
+.tag2{font-family:var(--f-mono);font-size:.78rem;color:var(--muted);min-width:4.6rem}
+.btns{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+button.b{font:600 .92rem var(--f-body);border-radius:8px;padding:8px 14px;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--ink);display:inline-flex;align-items:center;gap:8px}
+button.b.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+button.b:hover:not(:disabled){border-color:var(--accent)}
+button.b:disabled{opacity:.5;cursor:not-allowed}
+button.b svg{width:16px;height:16px;flex:none}
+.status{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.badge{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:3px 9px;border-radius:99px;border:1px solid currentColor}
+.badge.u{color:var(--ok)} .badge.n{color:var(--bad)} .badge.i{color:var(--accent)} .badge.w{color:var(--muted)}
+.result{display:flex;flex-direction:column;gap:12px;font-size:1.12rem;padding:14px 16px;border-radius:10px;background:var(--accent-soft)}
+.preview{display:flex;flex-direction:column;gap:4px;padding:10px 12px;border:1px dashed var(--line);border-radius:10px}
+.lbl{font-size:.74rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:0}
+.problem{color:var(--bad);font-weight:600;margin:0;padding:12px 14px;background:var(--bad-soft);border-radius:10px}
+.opt{display:flex;align-items:center;gap:8px;font-size:.9rem;color:var(--ink);cursor:pointer}
+.opt input{width:16px;height:16px;accent-color:var(--accent)}
+.note{color:var(--muted);font-size:.84rem;margin:0}
+.stephead{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+ol.steps{list-style:none;counter-reset:s;margin:0;padding:0;display:flex;flex-direction:column;gap:18px}
+ol.steps>li{counter-increment:s;display:grid;grid-template-columns:2rem minmax(0,1fr);gap:4px 10px}
+ol.steps>li::before{content:counter(s);grid-row:span 2;width:1.7rem;height:1.7rem;border-radius:50%;background:var(--accent-soft);color:var(--accent);font:700 .85rem var(--f-mono);display:grid;place-items:center}
+ol.steps h4{margin:2px 0 0;font-size:.95rem}
+ol.steps .body{min-width:0;display:flex;flex-direction:column;gap:8px}
+ol.steps .body p{margin:0;color:var(--muted);max-width:68ch}
+@media (prefers-reduced-motion:no-preference){ol.steps>li{animation:in .25s ease both}@keyframes in{from{opacity:.4;transform:translateY(4px)}to{opacity:1;transform:none}}}
+.formula{font-size:1rem;display:flex;flex-direction:column;gap:6px;padding:10px 12px;border:1px dashed var(--line);border-radius:10px}
+.guide{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
+.guide section{min-width:0}
+.guide ul,.guide ol{padding-left:1.2rem;margin:.4rem 0}
+.msg{font-weight:600;margin:0}
+.msg.ok{color:var(--ok)} .msg.bad{color:var(--bad)} .msg.info{color:var(--muted);font-weight:400}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:8px;font-weight:600;font-size:.9rem;z-index:20;max-width:calc(100% - 32px)}
+.ctrl{display:flex;flex-wrap:wrap;gap:16px 28px}
+.ctrl>div{display:flex;flex-direction:column;gap:6px}
+@media (max-width:480px){.panel{padding:16px}input.cell{width:3.1rem}}
+</style>
+
+
+<style>
+/* ===== Mejoras de interfaz ===== */
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.hero{background-color:#143272;background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);background-size:24px 24px;color:#fff;border-radius:18px;padding:clamp(20px,4vw,36px);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,340px);gap:24px 32px;align-items:center;border:1px solid rgba(255,255,255,.12)}
+.hero-text{min-width:0}
+.hero .brand{display:flex;align-items:center;gap:8px;margin:0 0 12px;font:700 .92rem var(--f-display);letter-spacing:.02em;color:#c9d8fb;max-width:none}
+.hero h1{font-size:clamp(1.7rem,4.4vw,2.6rem);line-height:1.1;color:#fff}
+.hero .h1-main{display:block}
+.hero .h1-brand{display:flex;align-items:center;gap:8px;margin-top:10px;font:500 clamp(1rem,2.2vw,1.2rem)/1.3 var(--f-body);color:#c9d8fb}
+.hero p{color:#d8e3fb}
+.hero .vX{color:#fdba74}.hero .vY{color:#5eead4}.hero .mI{color:#c9d8fb}
+.hero p{margin-top:14px;max-width:60ch}
+.hero-art{width:100%;height:auto;justify-self:center;max-width:340px;filter:drop-shadow(0 14px 26px rgba(0,0,0,.4));transform:rotate(-1.5deg)}
+@media (max-width:760px){.hero{grid-template-columns:minmax(0,1fr)}.hero-art{max-width:280px;justify-self:start}}
+nav.tabs{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px;width:fit-content;max-width:100%}
+nav.tabs button{border:0;border-radius:9px;margin:0;padding:9px 16px;transition:background-color .15s,color .15s}
+nav.tabs button:hover{color:var(--accent);background:var(--accent-soft)}
+nav.tabs button[aria-selected="true"]{background:var(--accent);color:var(--on-accent)}
+.panel{border-radius:14px;box-shadow:0 1px 2px rgba(21,32,58,.06),0 10px 28px -16px rgba(21,32,58,.22)}
+#resPanel{border-top:3px solid var(--accent)}
+.result{border:1px solid var(--line)}
+.chip,button.b{transition:border-color .15s,background-color .15s,filter .15s}
+button.b.primary:hover:not(:disabled){filter:brightness(1.08)}
+input:hover,select:hover{border-color:var(--muted)}
+input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.foot{display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:space-between;align-items:center;color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padding-top:16px;margin-top:8px}
+.foot a{color:var(--accent);font-weight:600;text-decoration:none}
+.foot a:hover{text-decoration:underline}
+@media (max-width:480px){nav.tabs{width:100%}nav.tabs button{flex:1 1 0;padding:9px 6px;font-size:.82rem;white-space:nowrap}}
+</style>
+<style>
+:root{--z:#7c3aed}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--z:#a78bfa}}
+:root[data-theme="dark"]{--z:#a78bfa}
+.vZ{color:var(--z);font-style:italic;font-family:var(--f-display)}
+.hero .vZ{color:#c4b5fd}
+.mat .g .aug{border-left:1.5px solid currentColor;padding-left:12px}
+.eqs{display:flex;flex-direction:column;gap:10px}
+.eqin .tag{width:2rem}
+.line .op{padding:0 5px}
+.opline{display:block;font-family:var(--f-mono);font-size:.88rem;color:var(--ink)}
+ol.steps .body h4{margin:2px 0 4px}
+ol.steps .body .scroll{max-width:100%}
+.sol .line{font-size:1.15rem}
+@media print{body{background:#fff;padding:0}.hero-art,nav.tabs,#inPanel,.btns,.foot,#classBtns,#modeChips,.toast{display:none!important}.cols{grid-template-columns:minmax(0,1fr)}.sticky{position:static}.panel{box-shadow:none;break-inside:avoid}.hero{background:#fff!important;border:1px solid #999}.hero *{color:#000!important}}
+</style>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="hero-text">
+      <h1><span class="h1-main">Calculadora de Sistemas de Ecuaciones</span><span class="sr-only"> - </span><span class="h1-brand"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M4 20V5l16 15z"/><path d="M4 15h5v5"/></svg>El Cuaderno de Pitágoras</span></h1>
+      <p>Resuelve sistemas de hasta 3 ecuaciones con 3 incógnitas por <b>matriz inversa</b> o por el <b>método de Gauss</b>. Distingue si el sistema es compatible determinado, compatible indeterminado o incompatible, trabaja con fracciones exactas y muestra el desarrollo paso a paso.</p>
+    </div>
+    <svg class="hero-art" viewBox="0 0 360 232" role="img" aria-label="Hoja de cuaderno con un sistema de tres ecuaciones con tres incógnitas y su matriz ampliada reducida">
+      <defs><pattern id="sq" width="16" height="16" patternUnits="userSpaceOnUse"><path d="M16 0H0V16" fill="none" stroke="#cfd9ec" stroke-width="1"/></pattern></defs>
+      <rect x="14" y="12" width="332" height="208" rx="12" fill="#fff"/><rect x="14" y="12" width="332" height="208" rx="12" fill="url(#sq)"/>
+      <rect x="14" y="12" width="332" height="208" rx="12" fill="none" stroke="#9db4dc" stroke-width="1.5"/><path d="M52 12V220" stroke="#e8a0a0" stroke-width="1.5"/>
+      <path d="M74 32c-9 0-9 4-9 12v26c0 8-3 10-9 10 6 0 9 2 9 10v26c0 8 0 12 9 12" fill="none" stroke="#15203a" stroke-width="2.4" stroke-linecap="round"/>
+      <g font-family="Georgia,serif" font-style="italic" font-size="22" fill="#15203a">
+        <text x="86" y="62">2<tspan fill="#c2410c" font-weight="700">x</tspan> + <tspan fill="#0f766e" font-weight="700">y</tspan> − <tspan fill="#7c3aed" font-weight="700">z</tspan> = 3</text>
+        <text x="86" y="94"><tspan fill="#c2410c" font-weight="700">x</tspan> − <tspan fill="#0f766e" font-weight="700">y</tspan> + 2<tspan fill="#7c3aed" font-weight="700">z</tspan> = 0</text>
+        <text x="86" y="126">3<tspan fill="#c2410c" font-weight="700">x</tspan> + <tspan fill="#0f766e" font-weight="700">y</tspan> + <tspan fill="#7c3aed" font-weight="700">z</tspan> = 7</text>
+      </g>
+      <path d="M76 144H330" stroke="#2357b8" stroke-width="1.6" stroke-dasharray="5 5"/>
+      <text x="76" y="196" font-family="Georgia,serif" font-style="italic" font-size="19" fill="#2357b8">Gauss</text><path d="M134 190h40m-8-7 8 7-8 7" fill="none" stroke="#2357b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <g transform="translate(196 156)"><path d="M8 0H1V52H8M104 0H111V52H104" fill="none" stroke="#2357b8" stroke-width="2.2"/>
+        <g fill="#c9d3e6"><rect x="12" y="6" width="9" height="9" rx="2" fill="#c2410c"/><rect x="34" y="6" width="9" height="9" rx="2"/><rect x="56" y="6" width="9" height="9" rx="2"/><rect x="82" y="6" width="9" height="9" rx="2" fill="#2357b8"/>
+        <rect x="12" y="22" width="9" height="9" rx="2"/><rect x="34" y="22" width="9" height="9" rx="2" fill="#0f766e"/><rect x="56" y="22" width="9" height="9" rx="2"/><rect x="82" y="22" width="9" height="9" rx="2" fill="#2357b8"/>
+        <rect x="12" y="38" width="9" height="9" rx="2"/><rect x="34" y="38" width="9" height="9" rx="2"/><rect x="56" y="38" width="9" height="9" rx="2" fill="#7c3aed"/><rect x="82" y="38" width="9" height="9" rx="2" fill="#2357b8"/></g>
+        <path d="M74 0V52" stroke="#2357b8" stroke-width="1.4"/></g>
+    </svg>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-tab="res">Resolver</button>
+    <button role="tab" aria-selected="false" data-tab="gui">Guía del método</button>
+  </nav>
+
+  <div id="v-res" class="view">
+    <div class="cols">
+      <div class="panel" id="inPanel">
+        <div class="stage">
+          <p class="lbl">Probar un ejemplo</p>
+          <div class="chips" id="exChips">
+            <button class="chip" data-ex="u">Solución única</button>
+            <button class="chip" data-ex="frac">Con fracciones</button>
+            <button class="chip" data-ex="i">Infinitas soluciones</button>
+            <button class="chip" data-ex="n">Sin solución</button>
+            <button class="chip" id="clear">Empezar en blanco</button>
+          </div>
+          <p class="hint">Cada clic genera un ejemplo nuevo con el tamaño que elijas abajo.</p>
+        </div>
+        <div class="stage">
+          <div class="sl"><i>1</i>Tamaño del sistema</div>
+          <div class="ctrl">
+            <div><p class="lbl">Ecuaciones</p><div class="chips" id="gM"><button class="chip" data-v="2">2</button><button class="chip" data-v="3" aria-pressed="true">3</button></div></div>
+            <div><p class="lbl">Incógnitas</p><div class="chips" id="gN"><button class="chip" data-v="2">2</button><button class="chip" data-v="3" aria-pressed="true">3</button></div></div>
+          </div>
+        </div>
+        <div class="stage">
+          <div class="sl"><i>2</i>Ecuaciones <small>escribe los coeficientes</small></div>
+          <div id="eqs" class="eqs"></div>
+          <p class="hint">Vale 5, −2, 0.5 o 3/4. Para restar, escribe el coeficiente en negativo; si una incógnita no aparece, pon 0. Con Intro pasas a la casilla siguiente.</p>
+        </div>
+        <div class="stage">
+          <div class="sl"><i>3</i>Método de resolución</div>
+          <div class="chips" id="mChips"><button class="chip" data-m="inv">Matriz inversa</button><button class="chip" data-m="gauss" aria-pressed="true">Método de Gauss</button></div>
+          <p class="hint" id="mHint"></p>
+        </div>
+      </div>
+
+      <div class="panel sticky" id="resPanel">
+        <div class="status"><h2>Resultado</h2><span class="badge w" id="resBadge">—</span></div>
+        <div class="preview"><p class="lbl">Tu sistema</p><div class="scroll" id="preview"></div></div>
+        <div id="resBody"></div>
+        <div class="stage"><label class="opt"><input type="checkbox" id="optSteps" checked> Incluir el desarrollo paso a paso en el PDF</label>
+          <div class="btns"><button class="b primary" id="pdf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-5-5m5 5l5-5M5 21h14"/></svg>Descargar PDF</button><button class="b" id="print">Imprimir</button></div>
+          <p class="note" id="dlNote" hidden></p></div>
+      </div>
+    </div>
+
+    <div class="panel" id="stepsPanel">
+      <div class="stephead"><h2>Desarrollo paso a paso</h2>
+        <div class="chips" id="modeChips"><button class="chip" data-mode="all" aria-pressed="true">Ver todo</button><button class="chip" data-mode="class" aria-pressed="false">Modo clase: de uno en uno</button></div>
+      </div>
+      <ol class="steps" id="steps"></ol>
+      <div class="btns" id="classBtns" hidden><button class="b primary" id="nextStep">Siguiente paso</button><button class="b" id="restart">Volver al principio</button></div>
+    </div>
+  </div>
+
+  <div id="v-gui" class="view" hidden>
+    <div class="panel"><div class="guide">
+      <section><h3>Los tres tipos de sistemas</h3>
+        <p>El teorema de Rouché–Capelli compara el rango de la matriz de coeficientes <span class="mI">A</span> con el de la ampliada (<span class="mI">A</span>|<span class="mI">B</span>) y con el número de incógnitas <span class="mI">n</span>.</p>
+        <ul><li>rg(A) = rg(A|B) = n: <b>compatible determinado</b>, una única solución.</li><li>rg(A) = rg(A|B) &lt; n: <b>compatible indeterminado</b>, infinitas soluciones con n − rg parámetros.</li><li>rg(A) &lt; rg(A|B): <b>incompatible</b>, no hay solución.</li></ul></section>
+      <section><h3>Matriz inversa</h3>
+        <ol><li>Escribe el sistema como A·X = B.</li><li>Calcula Δ = |A|. Si Δ = 0, no hay inversa.</li><li>Halla la matriz de cofactores, su traspuesta (adjunta) y A⁻¹ = (1/Δ)·Adj(A).</li><li>X = A⁻¹·B. Comprueba sustituyendo.</li></ol>
+        <p class="note">Solo sirve con matriz cuadrada y Δ ≠ 0. En los demás casos la calculadora pasa a Gauss.</p></section>
+      <section><h3>Método de Gauss</h3>
+        <ol><li>Escribe la matriz ampliada (A|B).</li><li>Con operaciones entre filas, haz ceros por encima y por debajo de cada pivote y deja pivotes iguales a 1.</li><li>Cuenta los rangos y clasifica el sistema.</li><li>Una fila 0 = c con c ≠ 0 indica que no hay solución. Las incógnitas sin pivote pasan a ser parámetros.</li></ol></section>
+      <section><h3>Errores frecuentes</h3>
+        <ul><li>Olvidar el signo al hacer F₂ ← F₂ − k·F₁ con k negativo.</li><li>Operar solo con parte de la fila y no con el término independiente.</li><li>Aplicar la inversa sin comprobar antes que Δ ≠ 0.</li><li>Dar la solución de un sistema indeterminado sin indicar los parámetros.</li></ul></section>
+      <section><h3>Ideas para clase</h3>
+        <ul><li>Proyecta un ejemplo y usa el modo clase para avanzar paso a paso.</li><li>Resuelve el mismo sistema con los dos métodos y compara.</li><li>Genera ejemplos de los tres tipos y pide que los clasifiquen antes de resolver.</li></ul></section>
+    </div></div>
+  </div>
+
+  <footer class="foot"><span>Calculadora de Sistemas de Ecuaciones · <b>El Cuaderno de Pitágoras</b></span><a href="https://mismat.wordpress.com/" target="_blank" rel="noopener">mismat.wordpress.com</a></footer>
+</div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+/* ================= Fracciones exactas ================= */
+function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b){const t=a%b;a=b;b=t}return a}
+class Fr{
+  constructor(n,d=1){if(d===0)throw new Error('div0');if(d<0){n=-n;d=-d}const g=gcd(n,d)||1;this.n=n/g||0;this.d=d/g}
+  add(o){return new Fr(this.n*o.d+o.n*this.d,this.d*o.d)}
+  sub(o){return new Fr(this.n*o.d-o.n*this.d,this.d*o.d)}
+  mul(o){return new Fr(this.n*o.n,this.d*o.d)}
+  inv(){return new Fr(this.d,this.n)}
+  neg(){return new Fr(-this.n,this.d)}
+  abs(){return new Fr(Math.abs(this.n),this.d)}
+  z(){return this.n===0}
+  eq(o){return this.n===o.n&&this.d===o.d}
+  one(){return this.n===1&&this.d===1}
+}
+const F=n=>new Fr(n);
+const fstr=f=>(f.n<0?'−':'')+Math.abs(f.n)+(f.d===1?'':'/'+f.d);
+function parseFr(s,coef=false){
+  s=String(s).trim().replace(/[−–]/g,'-').replace(',','.').replace(/\s+/g,'');
+  if(s==='')return null;
+  if(coef&&s==='-')return F(-1);
+  if(coef&&s==='+')return F(1);
+  let m=s.match(/^([+-]?\d+)\/([+-]?\d+)$/);
+  if(m){const d=+m[2];if(d===0)return undefined;return new Fr(+m[1],d)}
+  m=s.match(/^([+-]?)(\d*)\.(\d{1,6})$/);
+  if(m){const den=10**m[3].length;return new Fr((m[1]==='-'?-1:1)*((+(m[2]||0))*den+ +m[3]),den)}
+  if(/^[+-]?\d{1,9}$/.test(s))return F(+s);
+  return undefined;
+}
+/* ================= Utilidades de presentación ================= */
+const $=id=>document.getElementById(id);
+const VN=['x','y','z'],VC=['vX','vY','vZ'];
+const vh=j=>`<b class="${VC[j]}">${VN[j]}</b>`;
+const op=s=>`<span class="op">${s}</span>`;
+const nh=f=>f.d===1?`<span class="num">${f.n<0?'−':''}${Math.abs(f.n)}</span>`:`<span class="num">${f.n<0?'−':''}<span class="fr"><span>${Math.abs(f.n)}</span><span>${f.d}</span></span></span>`;
+const pp=f=>f.n<0?`(${fstr(f)})`:fstr(f);
+function linH(c,terms){let h='',any=false;
+  if(!c.z()){h+=nh(c);any=true}
+  for(const [k,nm] of terms){if(k.z())continue;const neg=k.n<0,a=k.abs();
+    h+=any?op(neg?'−':'+'):(neg?op('−'):'');any=true;if(!a.one())h+=nh(a);h+=nm}
+  return any?h:nh(F(0))}
+const eqH=(r,b,n)=>`<div class="line">${linH(F(0),r.slice(0,n).map((k,j)=>[k,vh(j)]))}${op('=')}${nh(b)}</div>`;
+const matH=(rows,aug=-1)=>`<span class="mat"><span class="g" style="grid-template-columns:repeat(${rows[0].length},auto)">${rows.map(r=>r.map((c,j)=>`<span${j===aug?' class="aug"':''}>${c}</span>`).join('')).join('')}</span></span>`;
+const fm=M=>M.map(r=>r.map(nh));
+const sc=h=>`<div class="scroll">${h}</div>`;
+const par=['λ','μ'].map(s=>`<i class="mI">${s}</i>`);
+
+/* ================= Álgebra ================= */
+function det(M){const n=M.length;if(n===1)return M[0][0];
+  if(n===2)return M[0][0].mul(M[1][1]).sub(M[0][1].mul(M[1][0]));
+  let s=F(0);for(let j=0;j<n;j++){const mn=M.slice(1).map(r=>r.filter((_,c)=>c!==j));const t=M[0][j].mul(det(mn));s=j%2?s.sub(t):s.add(t)}return s}
+const minorM=(M,i,j)=>M.filter((_,r)=>r!==i).map(r=>r.filter((_,c)=>c!==j));
+function detText(M,D){const g=(i,j)=>pp(M[i][j]);
+  if(M.length===2)return `Δ = ${g(0,0)}·${g(1,1)} − ${g(0,1)}·${g(1,0)} = ${fstr(D)}`;
+  return `Δ = ${g(0,0)}·${g(1,1)}·${g(2,2)} + ${g(0,1)}·${g(1,2)}·${g(2,0)} + ${g(0,2)}·${g(1,0)}·${g(2,1)} − ${g(0,2)}·${g(1,1)}·${g(2,0)} − ${g(0,0)}·${g(1,2)}·${g(2,1)} − ${g(0,1)}·${g(1,0)}·${g(2,2)} = ${fstr(D)}`}
+function gauss(A,B,m,n){let M=A.map((r,i)=>[...r,B[i]]),row=0;const steps=[],piv=[];
+  for(let col=0;col<n&&row<m;col++){let p=-1;for(let i=row;i<m;i++)if(!M[i][col].z()){p=i;break}
+    if(p<0)continue;const ops=[];
+    if(p!==row){[M[p],M[row]]=[M[row],M[p]];ops.push(`F${row+1} ↔ F${p+1}`)}
+    const pv=M[row][col];
+    if(!pv.one()){const iv=pv.inv();M[row]=M[row].map(x=>x.mul(iv));ops.push(`F${row+1} ← (${fstr(iv)})·F${row+1}`)}
+    for(let i=0;i<m;i++){if(i===row)continue;const f=M[i][col];if(f.z())continue;
+      M[i]=M[i].map((x,j)=>x.sub(f.mul(M[row][j])));
+      ops.push(`F${i+1} ← F${i+1} ${f.n<0?'+':'−'} ${f.abs().one()?'':fstr(f.abs())+'·'}F${row+1}`)}
+    steps.push({col,ops,M:M.map(r=>[...r])});piv.push(col);row++}
+  const r=piv.length,inc=M.slice(r).some(rw=>!rw[n].z());
+  const type=inc?'n':r===n?'u':'i';
+  return {M,steps,piv,r,rAB:r+(inc?1:0),type,xs:type==='u'?piv.map((c,i)=>M[i][n]):null}}
+
+function checkH(A,B,xs,m,n){return A.map((r,i)=>{const v=r.slice(0,n).reduce((s,k,j)=>s.add(k.mul(xs[j])),F(0));
+  return `<div class="line num">${r.slice(0,n).map((k,j)=>pp(k)+'·'+pp(xs[j])).join(' + ')} = ${fstr(v)}${v.eq(B[i])?'<span class="ck">✓</span>':' ≠ '+fstr(B[i])}</div>`}).join('')}
+const solH=xs=>`<div class="result sol">${xs.map((x,j)=>`<div class="line">${vh(j)}${op('=')}${nh(x)}</div>`).join('')}</div>`;
+
+function solve(A,B,m,n,method){
+  const S=[];let useInv=method==='inv',note='';
+  S.push({t:'Planteamos el sistema',h:A.map((r,i)=>eqH(r,B[i],n)).join('')});
+  if(useInv&&m!==n){useInv=false;note=`La matriz de coeficientes es ${m}×${n}: no es cuadrada y no tiene inversa, así que resolvemos con Gauss.`}
+  if(useInv){
+    S[0].h+=`<p>En forma matricial, A·X = B:</p>`+sc(matH(fm(A))+op('·')+matH(VN.slice(0,n).map((_,j)=>[vh(j)]))+op('=')+matH(B.map(b=>[nh(b)])));
+    const D=det(A),Z=D.z();
+    S.push({t:'Determinante de A',h:sc(`<span class="num">${detText(A,D)}</span>`)+`<p>${Z?'Δ = 0: A no tiene inversa y este método no sirve. Estudiamos el sistema con Gauss.':'Δ ≠ 0: A es invertible, así que el sistema tiene solución única (rg A = rg A|B = '+n+').'}</p>`});
+    if(!Z){
+      const C=A.map((r,i)=>r.map((_,j)=>{const d=det(minorM(A,i,j));return (i+j)%2?d.neg():d}));
+      const Adj=C[0].map((_,j)=>C.map(r=>r[j])),Inv=Adj.map(r=>r.map(x=>x.mul(D.inv())));
+      S.push({t:'Matriz de cofactores',h:`<p>Cada cofactor es el determinante que queda al quitar la fila y la columna del elemento, multiplicado por (−1)<sup>i+j</sup>.</p>`+sc(matH(fm(C)))});
+      S.push({t:'Matriz inversa',h:`<p>La adjunta es la traspuesta de los cofactores y A⁻¹ = (1/Δ)·Adj(A).</p>`+sc(`<i class="mI">A</i><sup>−1</sup>${op('=')}${nh(D.inv())}${op('·')}${matH(fm(Adj))}${op('=')}${matH(fm(Inv))}`)});
+      const X=Inv.map(r=>r.reduce((s,k,j)=>s.add(k.mul(B[j])),F(0)));
+      S.push({t:'Calculamos X = A⁻¹·B',h:sc(matH(fm(Inv))+op('·')+matH(B.map(b=>[nh(b)]))+op('=')+matH(X.map(x=>[nh(x)])))+solH(X)});
+      S.push({t:'Comprobación',h:'<p>Sustituimos en cada ecuación:</p>'+checkH(A,B,X,m,n)});
+      return {type:'u',S,xs:X,r:n,rAB:n,note};
+    }
+  }
+  const g=gauss(A,B,m,n);
+  S.push({t:'Matriz ampliada',h:'<p>Escribimos los coeficientes y los términos independientes; la barra los separa.</p>'+sc(matH(fm(A.map((r,i)=>[...r,B[i]])),n))});
+  g.steps.forEach(s=>S.push({t:`Pivote en la columna ${s.col+1} (${VN[s.col]})`,h:`<div>${s.ops.map(o=>`<span class="opline">${o}</span>`).join('')||'<p>El pivote ya vale 1 y no hay nada que eliminar.</p>'}</div>`+sc(matH(fm(s.M),n))}));
+  const verdict={u:`rg(A) = rg(A|B) = ${n} = nº de incógnitas: sistema compatible determinado.`,
+    i:`rg(A) = rg(A|B) = ${g.r} < ${n}: sistema compatible indeterminado, con ${n-g.r} parámetro${n-g.r>1?'s':''}.`,
+    n:`rg(A) = ${g.r} < rg(A|B) = ${g.rAB}: sistema incompatible.`}[g.type];
+  S.push({t:'Estudio de rangos (Rouché–Capelli)',h:`<p>rg(A) = ${g.r}, rg(A|B) = ${g.rAB}, incógnitas = ${n}.</p><p><b>${verdict}</b></p>`});
+  let lines=null;
+  if(g.type==='u'){S.push({t:'Solución',h:solH(g.xs)});S.push({t:'Comprobación',h:'<p>Sustituimos en cada ecuación original:</p>'+checkH(A,B,g.xs,m,n)})}
+  else if(g.type==='i'){
+    const free=[...Array(n).keys()].filter(c=>!g.piv.includes(c));const pn={};free.forEach((c,k)=>pn[c]=par[k]);
+    lines=VN.slice(0,n).map((_,j)=>{const i=g.piv.indexOf(j);
+      return `<div class="line">${vh(j)}${op('=')}${i<0?pn[j]:linH(g.M[i][n],free.map(f=>[g.M[i][f].neg(),pn[f]]))}</div>`}).join('');
+    S.push({t:'Solución con parámetros',h:`<p>Las incógnitas sin pivote (${free.map(c=>vh(c)).join(', ')}) pasan a ser parámetros: ${free.map(c=>`${vh(c)} = ${pn[c]}`).join(', ')}, con ${par.slice(0,free.length).join(', ')} ∈ ℝ.</p><div class="result sol">${lines}</div>`})}
+  else{const bad=g.M.slice(g.r).find(rw=>!rw[n].z());
+    S.push({t:'Contradicción',h:`<p>Queda una ecuación imposible:</p>`+sc(`<div class="line">${nh(F(0))}${op('=')}${nh(bad[n])}</div>`)+'<p>Ningún valor de las incógnitas la cumple: el sistema no tiene solución.</p>'})}
+  return {type:g.type,S,xs:g.xs,lines,r:g.r,rAB:g.rAB,note}}
+
+/* ================= Generador de ejemplos ================= */
+const ri=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+function genEx(type,frac,m,n){
+  if(type==='u'&&m<n)return null;
+  const R=()=>ri(-4,4),rows=(r,c)=>Array.from({length:r},()=>Array.from({length:c},R));
+  for(let t=0;t<500;t++){let A;
+    const k=type==='u'?null:type==='i'?(m>=n?n-1:null):Math.min(m,n)-1;
+    if(k==null)A=rows(m,n);
+    else{const Bs=rows(k,n),C=rows(m,k);A=C.map(c=>Bs[0].map((_,j)=>c.reduce((s,ck,q)=>s+ck*Bs[q][j],0)))}
+    if(A.some(r=>r.every(x=>x===0)))continue;
+    const sol=Array.from({length:n},R);let B=A.map(r=>r.reduce((s,a,j)=>s+a*sol[j],0));
+    if(type==='u'&&frac)B=A.map(()=>ri(-6,6));
+    if(type==='n'){B[ri(0,m-1)]+=ri(1,3)*(Math.random()<.5?-1:1)}
+    const AF=A.map(r=>r.map(F)),g=gauss(AF,B.map(F),m,n);
+    if(g.type!==type)continue;
+    if(type==='u'){if(g.xs.every(x=>x.d===1)===frac)continue;if(m===n&&Math.abs(det(AF).n)>15)continue}
+    return {A,B}}
+  return null}
+
+/* ================= Estado e interfaz ================= */
+let m=3,n=3,method='gauss',mode='all',shown=1,cur=null;
+let vals=Array.from({length:3},()=>['','','','']);
+function buildInputs(){const box=$('eqs');box.innerHTML='';
+  for(let i=0;i<m;i++){let h=`<div class="eqin"><span class="tag">(${i+1})</span>`;
+    for(let j=0;j<n;j++)h+=`${j?op('+'):''}<input class="coef" data-i="${i}" data-j="${j}" value="${vals[i][j]}" autocomplete="off" aria-label="Coeficiente de ${VN[j]} en la ecuación ${i+1}">${vh(j)}`;
+    h+=`${op('=')}<input class="coef" data-i="${i}" data-j="3" value="${vals[i][3]}" autocomplete="off" aria-label="Término independiente de la ecuación ${i+1}"></div>`;
+    box.insertAdjacentHTML('beforeend',h)}}
+function toast(t){const e=$('toast');e.textContent=t;e.hidden=false;clearTimeout(toast.k);toast.k=setTimeout(()=>e.hidden=true,3200)}
+function readSys(){const A=[],B=[];let bad=false;
+  for(let i=0;i<m;i++){A.push([]);for(let j=0;j<=n;j++){const jj=j<n?j:3,s=vals[i][jj];const p=s.trim()===''?F(0):parseFr(s,true);
+    const inp=document.querySelector(`#eqs input[data-i="${i}"][data-j="${jj}"]`);
+    if(p===undefined){bad=true;inp&&inp.classList.add('bad')}else inp&&inp.classList.remove('bad');
+    if(j<n)A[i].push(p||F(0));else B.push(p||F(0))}}
+  return bad?null:{A,B}}
+const BD={u:['u','Compatible determinado'],i:['i','Compatible indeterminado'],n:['n','Incompatible']};
+function renderSteps(){const S=cur?cur.S:[];const list=mode==='class'?S.slice(0,shown):S;
+  $('steps').innerHTML=list.map(s=>`<li><div class="body"><h4>${s.t}</h4>${s.h}</div></li>`).join('');
+  $('classBtns').hidden=mode!=='class';$('nextStep').disabled=shown>=S.length}
+function update(){const sys=readSys();shown=1;
+  if(!sys){cur=null;$('resBadge').className='badge w';$('resBadge').textContent='—';$('preview').innerHTML='';
+    $('resBody').innerHTML='<p class="problem">Hay una casilla que no es un número válido. Usa enteros, decimales (0.5) o fracciones (3/4).</p>';renderSteps();return}
+  const {A,B}=sys;
+  $('preview').innerHTML=A.map((r,i)=>eqH(r,B[i],n)).join('');
+  const all0=A.every(r=>r.every(x=>x.z()))&&B.every(x=>x.z());
+  cur=solve(A,B,m,n,method);
+  const [c,t]=BD[cur.type];$('resBadge').className='badge '+c;$('resBadge').textContent=t;
+  let h='';
+  if(cur.type==='u')h=solH(cur.xs);
+  else if(cur.type==='i')h=`<div class="result sol">${cur.lines}</div><p class="note">Con ${par.slice(0,n-cur.r).join(', ')} ∈ ℝ cualquiera.${all0?' (Todas las ecuaciones son 0 = 0.)':''}</p>`;
+  else h='<p class="problem">El sistema no tiene solución.</p>';
+  h+=`<p class="note">rg(A) = ${cur.r} · rg(A|B) = ${cur.rAB} · incógnitas = ${n}</p>`;
+  if(cur.note)h+=`<p class="note">${cur.note}</p>`;
+  $('resBody').innerHTML=h;renderSteps()}
+function press(box,btn){box.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed',c===btn))}
+function setHint(){$('mHint').textContent=method==='inv'?'Solo funciona si el sistema tiene tantas ecuaciones como incógnitas y Δ ≠ 0. Si no, la calculadora pasa a Gauss.':'Funciona con cualquier sistema y permite clasificarlo y resolverlo siempre.'}
+$('eqs').addEventListener('input',e=>{const t=e.target;if(!t.dataset||t.dataset.i===undefined)return;vals[+t.dataset.i][+t.dataset.j]=t.value;update()});
+$('eqs').addEventListener('keydown',e=>{if(e.key!=='Enter')return;e.preventDefault();const L=[...$('eqs').querySelectorAll('input')],k=L.indexOf(e.target);(L[k+1]||L[0]).focus()});
+$('gM').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;m=+b.dataset.v;press($('gM'),b);buildInputs();update()});
+$('gN').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;n=+b.dataset.v;press($('gN'),b);buildInputs();update()});
+$('mChips').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;method=b.dataset.m;press($('mChips'),b);setHint();update()});
+$('modeChips').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;mode=b.dataset.mode;press($('modeChips'),b);shown=1;renderSteps()});
+$('nextStep').addEventListener('click',()=>{shown++;renderSteps()});
+$('restart').addEventListener('click',()=>{shown=1;renderSteps()});
+function loadEx(type,frac){const g=genEx(type,frac,m,n);
+  if(!g){toast('Con '+m+' ecuaciones y '+n+' incógnitas no puede haber solución única. Prueba otro tipo o cambia el tamaño.');return}
+  vals=Array.from({length:3},(_,i)=>['','','',''].map((_,j)=>i<m?String(j<n?g.A[i][j]:j===3?g.B[i]:''):''));
+  buildInputs();update()}
+$('exChips').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;
+  if(b.id==='clear'){vals=Array.from({length:3},()=>['','','','']);buildInputs();update();return}
+  const x=b.dataset.ex;loadEx(x==='frac'?'u':x,x==='frac')});
+$('print').addEventListener('click',()=>{try{window.print()}catch(e){toast('No se pudo abrir la impresión desde aquí.')}});
+function showTab(t){document.querySelectorAll('nav.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));
+  ['res','gui'].forEach(id=>$('v-'+id).hidden=id!==t)}
+document.querySelectorAll('nav.tabs button').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
+
+/* ================= PDF sin librerías (funciona sin conexión) ================= */
+const ASC={'−':'-','Δ':'Det','⁻':'^-','λ':'lambda','μ':'mu','←':'<-','↔':'<->','✓':' (ok)','≠':'!=','ℝ':'R','∈':'en','≤':'<=','≥':'>=','–':'\x96','—':'\x97','’':"'",'“':'"','”':'"'};
+const asc=s=>[...s].map(ch=>ASC[ch]!==undefined?ASC[ch]:(ch.charCodeAt(0)<256?ch:'?')).join('').replace(/(\d)(lambda|mu)/g,'$1*$2');
+const pdfStr=s=>asc(s).replace(/[\\()]/g,'\\$&');
+function domLines(el){const out=[];let pcs=[];
+  const txt=n=>n.nodeType===3?n.textContent:n.classList&&n.classList.contains('fr')?n.children[0].textContent+'/'+n.children[1].textContent:n.tagName==='SUP'?'^'+n.textContent:[...n.childNodes].map(txt).join('');
+  const mat=m=>{const g=m.firstElementChild,c=+/repeat\((\d+)/.exec(g.style.gridTemplateColumns)[1],cells=[...g.children],rows=[];
+    for(let i=0;i<cells.length;i+=c)rows.push(cells.slice(i,i+c));
+    const w=Array.from({length:c},(_,j)=>Math.max(...rows.map(r=>txt(r[j]).length)));
+    return rows.map(r=>'[ '+r.map((x,j)=>(x.classList.contains('aug')?'| ':'')+txt(x).padStart(w[j])).join('  ')+' ]')};
+  const flush=()=>{if(!pcs.length)return;
+    if(pcs.some(p=>typeof p!=='string')){const h=Math.max(...pcs.map(p=>typeof p==='string'?1:p.length)),mid=Math.floor((h-1)/2),rows=Array.from({length:h},()=>'');
+      pcs.forEach(p=>{if(typeof p==='string'){const s=p.replace(/\s+/g,' ');rows.forEach((r,i)=>rows[i]=r+(i===mid?s:' '.repeat(s.length)))}
+        else{const off=Math.floor((h-p.length)/2),w=p[0].length;rows.forEach((r,i)=>{const q=p[i-off];rows[i]=r+(q!==undefined&&i>=off?q:' '.repeat(w))})}});
+      out.push(...rows.map(r=>r.replace(/\s+$/,'')))}
+    else{const s=pcs.join('').replace(/\s+/g,' ').trim();if(s)out.push(s)}
+    pcs=[]};
+  const walk=n=>{if(n.nodeType===3){pcs.push(n.textContent);return}if(n.nodeType!==1)return;const c=n.classList;
+    if(c.contains('mat')){pcs.push(mat(n));return}
+    if(c.contains('op')){pcs.push(' '+n.textContent+' ');return}
+    if(c.contains('fr')||n.tagName==='SUP'){pcs.push(txt(n));return}
+    const blk=['DIV','P','LI','OL','UL'].includes(n.tagName)||c.contains('opline');
+    if(blk)flush();n.childNodes.forEach(walk);if(blk)flush()};
+  el.childNodes.forEach(walk);flush();return out}
+function makePDF(items){const W=595,H=842,M=54,maxw=W-2*M,pages=[[]];let y=M;
+  const cur=()=>pages[pages.length-1],put=(f,s,t)=>cur().push(`BT /${f} ${s} Tf ${M} ${(H-y).toFixed(1)} Td (${pdfStr(t)}) Tj ET`);
+  const need=h=>{if(y+h>H-M){pages.push([]);y=M}};
+  for(const it of items){
+    if(it.k==='title'){need(34);y+=18;put('F1',17,it.t);y+=4}
+    else if(it.k==='sub'){need(18);y+=12;put('F3',10.5,it.t);y+=4}
+    else if(it.k==='rule'){need(10);y+=6;cur().push(`0.8 w ${M} ${(H-y).toFixed(1)} m ${W-M} ${(H-y).toFixed(1)} l S`);y+=4}
+    else if(it.k==='h'){need(54);y+=it.gap??16;put('F1',12.5,it.t);y+=4}
+    else{const s=Math.max(6,Math.min(10,maxw/(asc(it.t).length*.6)));need(s*1.4);y+=s*1.4;put('F2',s,it.t)}}
+  const n=pages.length;pages.forEach((p,i)=>p.push(`BT /F3 8 Tf ${M} 30 Td (${pdfStr(`mismat.wordpress.com · Página ${i+1} de ${n}`)}) Tj ET`));
+  const objs=[];const add=s=>objs.push(s);
+  add('<</Type/Catalog/Pages 2 0 R>>');add('');
+  ['Helvetica-Bold','Courier','Helvetica'].forEach(f=>add(`<</Type/Font/Subtype/Type1/BaseFont/${f}/Encoding/WinAnsiEncoding>>`));
+  const kids=[];
+  pages.forEach(p=>{const body=p.join('\n');add(`<</Length ${body.length}>>\nstream\n${body}\nendstream`);const c=objs.length;
+    add(`<</Type/Page/Parent 2 0 R/MediaBox[0 0 ${W} ${H}]/Resources<</Font<</F1 3 0 R/F2 4 0 R/F3 5 0 R>>>>/Contents ${c} 0 R>>`);kids.push(objs.length+' 0 R')});
+  objs[1]=`<</Type/Pages/Count ${kids.length}/Kids[${kids.join(' ')}]>>`;
+  let out='%PDF-1.4\n';const off=[];objs.forEach((o,i)=>{off.push(out.length);out+=`${i+1} 0 obj\n${o}\nendobj\n`});
+  const x=out.length;out+=`xref\n0 ${objs.length+1}\n0000000000 65535 f \n`+off.map(o=>String(o).padStart(10,'0')+' 00000 n \n').join('')+`trailer\n<</Size ${objs.length+1}/Root 1 0 R>>\nstartxref\n${x}\n%%EOF`;
+  return Uint8Array.from(out,ch=>ch.charCodeAt(0)&255)}
+function buildResultPDF(withSteps){
+  const it=[{k:'title',t:'Calculadora de Sistemas de Ecuaciones'},{k:'sub',t:'El Cuaderno de Pitágoras · mismat.wordpress.com'},{k:'rule'}];
+  const L=el=>domLines(el).forEach(t=>it.push({k:'l',t}));
+  it.push({k:'h',t:'Sistema',gap:10});L($('preview'));
+  it.push({k:'h',t:'Resultado: '+$('resBadge').textContent});L($('resBody'));
+  it.push({k:'l',t:''},{k:'l',t:'Método empleado: '+(cur.S.some(s=>s.t==='Matriz inversa')?'matriz inversa':'Gauss')});
+  if(withSteps){it.push({k:'rule'},{k:'h',t:'Desarrollo paso a paso',gap:10});
+    cur.S.forEach((s,i)=>{it.push({k:'h',t:`${i+1}. ${s.t}`,gap:20});const d=document.createElement('div');d.innerHTML=s.h;L(d)})}
+  return makePDF(it)}
+let lastUrl=null;
+async function saveBlob(bytes,filename){const blob=new Blob([bytes],{type:'application/pdf'});
+  try{if(window.claude&&typeof window.claude.use==='function'){const dl=await window.claude.use('downloads');if(dl){await dl.save({filename,data:blob});return 'ok'}}}
+  catch(e){if(e&&e.code==='declined')return 'declined'}
+  if(lastUrl)URL.revokeObjectURL(lastUrl);lastUrl=URL.createObjectURL(blob);
+  try{const a=document.createElement('a');a.href=lastUrl;a.download=filename;document.body.appendChild(a);a.click();a.remove()}catch(e){}
+  return 'link'}
+$('pdf').addEventListener('click',async e=>{if(!cur){toast('Corrige primero el sistema.');return}
+  const b=e.currentTarget,lab=b.innerHTML;b.disabled=true;b.textContent='Preparando PDF…';
+  try{const r=await saveBlob(buildResultPDF($('optSteps').checked),`sistema-${m}x${n}.pdf`);
+    if(r==='declined')toast('Descarga cancelada');
+    else{toast('PDF generado');const note=$('dlNote');
+      if(r==='link'){note.innerHTML='Si no se ha descargado, <a href="'+lastUrl+'" target="_blank" rel="noopener">abre el PDF en una pestaña nueva</a> o usa «Imprimir».';note.hidden=false}else note.hidden=true}}
+  catch(err){toast('No se pudo generar el PDF.')}
+  finally{b.innerHTML=lab;b.disabled=false}});
+
+setHint();loadEx('u',false);
+
+</script>
+</body></html>
